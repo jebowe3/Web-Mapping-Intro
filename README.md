@@ -160,5 +160,5 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 This gives the map a dark base map that minimizes the visual clutter so that we can bring our data to the foreground. When you make your own maps, you will want to think carefully about how your base map choice with work or clash with your data and choose appropriately. Now your map should look like this:
 
-![Changing the Base Map](images/map-shot-2.png)  
+![Changing the Base Map](images/map-2.png)  
 **Figure 11**. Changing the base map.
