@@ -309,7 +309,61 @@ $.when(
 });
 ```
 
-After saving your code and refreshing your map in live server, you should now see the two datasets symbolized in your map with different colors. This map is starting to make more sense.
+After saving your code and refreshing your map in live server, you should now see the two datasets symbolized in your map with different colors. This map is starting to make more sense. For you own practice, try swapping out the colors for other colors. You can type the names of new colors or, for a wider range of shades, you can use [hex color codes](https://htmlcolorcodes.com/) within the quotation marks (ex: "orange" --> "#33ffac") and see what happens. Switch the colors back to orange and yellow.
 
 ![Visualizing the Data by File](images/style-data-1.png)  
 **Figure 17**. Visualizing the data by source file.
+
+Now, let's add a bit of user interaction. If you move your cursor across the map, you will notice that it changes as you hover over a polygon. Using Leaflet, we can make popup content appear to tell us more about each feature when we hover over them. We will need to return to console logging to determine what sort of information we might be able to add, as well as to test our code as we go. But first, we need to add a block of code after each segment pertaining to the style of our layers. Add the following "onEachFeature" block to your ongoing layer edits:
+
+```js
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function  
+).done(function(caliFires, caliCities) {
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+  const wildfires = L.geoJson(caliFires, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "orange", // set the polygon fill to orange
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "orange", // set the outline color to orange
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // log the properties to the web console
+      console.log(layer.feature.properties);
+    }
+  }).addTo(map);
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+  const urban = L.geoJson(caliCities, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "yellow", // set the polygon fill to yellow
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "yellow", // set the outline color to yellow
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // log the properties to the web console
+      console.log(layer.feature.properties);
+    }
+  }).addTo(map);
+});
+```
+
+Save these edits and open Web Console on your live served map. Notice how you can now see all of the feature properties logged in Web Console for every polygon on the map.
+
+![Logging Feature Properties in Web Console](images/feature-properties.png)  
+**Figure 18**. Logging feature properties in Web Console.
