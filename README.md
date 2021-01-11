@@ -3,12 +3,13 @@ Online tutorials for Leaflet Web Mapping
 
 ## Contents
 
-- [Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps](#week-1-finding-and-wrangling-data-basic-web-map-code-structure-open-source-base-maps)
+- [Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps](#lesson-1-finding-and-wrangling-data-basic-web-map-code-structure-open-source-base-maps)
   - [The Basic Components of a Leaflet Web Map](#the-basic-components-of-a-leaflet-web-map)
   - [Finding and Wrangling Data](#finding-and-wrangling-data)
   - [Basic Web Map Coding](#basic-web-map-coding)
   - [Open Source Base Maps](#open-source-base-maps)
   - [Lesson 1 Recap](#lesson-1-recap)
+- [Lesson 2: Loading and Styling Data in a Leaflet Web Map](#lesson-2-loading-and-styling-data-in-a-leaflet-web-map)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -148,6 +149,7 @@ To explain a little about what is happening here, take a look at the lines of co
 Finally, you have defined a base map with L.tileLayer. At [this site](https://leaflet-extras.github.io/leaflet-providers/preview/), Leaflet provides many other options for free base maps that you can use. Let's change the base map now. Go ahead and swap out:
 
 ```js
+// add a base map to the map
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -157,6 +159,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 for:
 
 ```js
+// add a base map to the map
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
   subdomains: 'abcd',
@@ -172,3 +175,141 @@ This gives the map a dark base map that minimizes the visual clutter so that we 
 ### Lesson 1 Recap
 
 This concludes the first lesson. By the end of this lesson, you should be familiar with finding and downloading geospatial data, converting these data into JSON format and reducing the file size using Mapshaper, organizing your project folder for web mapping, using Atom text editor for setting up a basic index template with HTML, Leaflet CSS, and Leaflet JavaScript in order to produce an initial web map, checking edits with Atom Live Server, centering the map on a specific geographic area using coordinates and zoom settings, and implementing different base maps with Leaflet JavaScript. These first steps are giant steps, so you might want to return to the beginning and review everything one more time to help it settle!
+
+## Lesson 2: Loading and Styling Data in a Leaflet Web Map
+
+Last time, we explored editing some basic Leaflet JavaScript in Atom to run a base map over the web. This time, we will be building out from this foundation, and you will learn how to add and style your GeoJSON data for effective geographic data visualization.
+
+### Using jQuery Ajax Methods to Load Data
+
+To help us do this more easily, we will get some assistance from a JavaScript library called [jQuery](https://jquery.com/). This library allows us to use ajax methods to load our data, which you can identify in the scripts starting with $. To add this library to your project, open your project in Atom and link to the jQuery library just below the link to the Leaflet JavaScript library in your index.html file.
+
+```html
+<!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+<!-- Add a link to the jQuery JavaScript library so you can leverage ajax methods to load your data -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+```
+
+Now you are able to use ajax methods to bring your JSON files into your web map. Just beneath the JavaScript that adds your base map to you web map, add the ajax requests like so:
+
+```js
+// add a base map to the map
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 20
+}).addTo(map);
+
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function  
+).done(function(caliFires, caliCities) {
+  // write code to do something with the data here
+});
+```
+
+Next, we need to check that our data files are indeed accessible and that there are no errors. For this, we can use a handy tool called Web Console. Open your project in your web browser using Atom Live Server. I am using Firefox, so the following instructions for accessing Web Console will apply for Firefox. If you are using something else, run a search with Google for how to access Web Console for your web browser. First, locate Web Developer Tools at the top right of your screen as follows:
+
+![Locating Web Developer Tools](images/web-dev-tools.png)  
+**Figure 12**. Locating Web Developer Tools.
+
+Click on Web Developer and select Web Console from the tool bar.
+
+![Locating Web Console](images/web-console.png)  
+**Figure 13**. Locating Web Console.
+
+The console should now appear beneath your web map in your browser window. If there are any errors in your coding, you will be able to see the warnings here and find clues for debugging your code. Now, let's run a command to test if our data is accessible. Replace the commented out code "write code to do something with the data here" with the following:
+
+```js
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function  
+).done(function(caliFires, caliCities) {
+  // log the data to Web Console
+  console.log(caliFires);
+  console.log(caliCities);
+});
+```
+
+If all goes well, you should see the following in your console:
+
+![Logging Your Data to Web Console](images/console-success.png)  
+**Figure 14**. Logging data to the console.
+
+If you expand the logged content by clicking the triangles in the console, you can see the data contained within the loaded files and their properties.
+
+![Viewing Data Properties in the Console](images/console-data-props.png)  
+**Figure 15**. Viewing data properties in the console.
+
+Before we try to use these properties to style our map data, we need to figure out how to add this content to the map so that we can see it. Replace the console.log commands in your JavaScript with these:
+
+```js
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function  
+).done(function(caliFires, caliCities) {
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+  const wildfires = L.geoJson(caliFires).addTo(map);
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+  const urban = L.geoJson(caliCities).addTo(map);
+});
+```
+
+Save and refresh. Now, when you look at your map, you should see all the polygons represented with thick blue lines. What did we just do? Within the function, we used a method (L.geoJson) from the Leaflet library to access the GeoJSON data and then we added it to the map with ".addTo(map)". We also defined the files with constants so that we can access the data in later scripts within the document. Returning to the map, it is nice to see your data, but it is not easy to make sense of it. Let's see what we can do to start making this legible.
+
+![Initial Visualization of the Data](images/initial-data-add.png)  
+**Figure 16**. Initial visualization of the data.
+
+First, let's style these polygons so that the wildfires appear orange and the urban areas appear yellow. Change the code above to the following:
+
+```js
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function  
+).done(function(caliFires, caliCities) {
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+  const wildfires = L.geoJson(caliFires, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "orange", // set the polygon fill to orange
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "orange", // set the outline color to orange
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    }
+  }).addTo(map);
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+  const urban = L.geoJson(caliCities, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "yellow", // set the polygon fill to yellow
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "yellow", // set the outline color to yellow
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    }
+  }).addTo(map);
+});
+```
+
+After saving your code and refreshing your map in live server, you should now see the two datasets symbolized in your map with different colors. This map is starting to make more sense.
+
+![Visualizing the Data by File](images/style-data-1.png)  
+**Figure 17**. Visualizing the data by source file.
