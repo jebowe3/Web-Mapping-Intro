@@ -367,3 +367,138 @@ Save these edits and open Web Console on your live served map. Notice how you ca
 
 ![Logging Feature Properties in Web Console](images/feature-properties.png)  
 **Figure 18**. Logging feature properties in Web Console.
+
+In the console, you can see the names of each property along with the stored value for that property. We might imagine that someone using our map would like to be able to see the name of each city (name10) upon hovering over urban areas, as well as to see the name (FIRE_NAME), date (ALARM_DATE), and acres (GIS_ACRES) burned for each of the wildfire polygons on the map. Before we try to bind this information to a tooltip, try editing the console logs to the following:
+
+```js
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function  
+).done(function(caliFires, caliCities) {
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+  const wildfires = L.geoJson(caliFires, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "orange", // set the polygon fill to orange
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "orange", // set the outline color to orange
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // log the properties to the web console
+      console.log(layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE + "<br>" + layer.feature.properties.GIS_ACRES + " acres burned");
+    }
+  }).addTo(map);
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+  const urban = L.geoJson(caliCities, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "yellow", // set the polygon fill to yellow
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "yellow", // set the outline color to yellow
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // log the properties to the web console
+      console.log(layer.feature.properties.name10);
+    }
+  }).addTo(map);
+});
+```
+
+Save, refresh the map, and check the console.
+
+![Customizing Feature Properties in Web Console](images/console-data-props-2.png)  
+**Figure 19**. Customizing feature properties in Web Console.
+
+The city names look ready to add to a tooltip, but the wildfire info will need some more work. First, the temporal data is too fine. Users probably don't need to see all of those hour, minute, and second zeroes. Second, the acreage data is also too fine. We can get away with a rounded figure with no decimal places. Let's edit the wildfire console log to the following:
+
+```js
+// for each feature...
+onEachFeature: function(feature, layer) {
+  // log the properties to the web console
+  console.log(layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned");
+}
+```
+
+Your logged wildfire data should now look like this in your console:
+
+![Final Wildfire Data](images/fire-data-final.png)  
+**Figure 20**. Final wildfire data in Web Console.
+
+That looks good, but what exactly did we do? The code segment ".substring(0,10)" retrieved only the first 10 characters from each date, removing the time content. Meanwhile "parseInt()" took the acreage and parsed it as an integer, instead of as a real number, thereby deleting the decimal places.
+
+Now that this information is properly formatted for an interactive tooltip element, it's time to add some new code to each layer. In order to add tooltip content to your layers, update your layer code as follows, using "layer.bindTooltip":
+
+```js
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function
+).done(function(caliFires, caliCities) {
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+  const wildfires = L.geoJson(caliFires, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "orange", // set the polygon fill to orange
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "orange", // set the outline color to orange
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // define the tooltip info
+      let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
+      // bind the tooltip to the layer and add the content defined as "wildfireTooltip" above
+      layer.bindTooltip(wildfireTooltip, {
+        sticky: true,
+        className: "tooltip",
+      });
+    }
+  }).addTo(map);
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+  const urban = L.geoJson(caliCities, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "yellow", // set the polygon fill to yellow
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "yellow", // set the outline color to yellow
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // define the tooltip info
+      let cityTooltip = layer.feature.properties.name10;
+      // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+      layer.bindTooltip(cityTooltip, {
+        sticky: true,
+        className: "tooltip",
+      });
+    }
+  }).addTo(map);
+});
+```
+
+After saving and refreshing, you should now see informative tooltip content when you hover over your map layers.
+
+![Interactive Tooltip Content](images/tooltip-content.png)  
+**Figure 21**. Interactive tooltip content.
