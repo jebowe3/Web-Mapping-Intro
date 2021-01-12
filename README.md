@@ -10,6 +10,8 @@ Online tutorials for Leaflet Web Mapping
   - [Open Source Base Maps](#open-source-base-maps)
   - [Lesson 1 Recap](#lesson-1-recap)
 - [Lesson 2: Loading and Styling Data in a Leaflet Web Map](#lesson-2-loading-and-styling-data-in-a-leaflet-web-map)
+  - [Using jQuery Ajax Methods to Load Data](#using-jquery-ajax-methods-to-load-data)
+  - [Using the Web Console to Develop and Debug Maps with Live Server](#using-the-web-console-to-develop-and-debug-maps-with-live-server)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -211,6 +213,8 @@ $.when(
   // write code to do something with the data here
 });
 ```
+
+### Using the Web Console to Develop and Debug Maps with Live Server
 
 Next, we need to check that our data files are indeed accessible and that there are no errors. For this, we can use a handy tool called Web Console. Open your project in your web browser using Atom Live Server. I am using Firefox, so the following instructions for accessing Web Console will apply for Firefox. If you are using something else, run a search with Google for how to access Web Console for your web browser. First, locate Web Developer Tools at the top right of your screen as follows:
 
