@@ -12,6 +12,8 @@ Online tutorials for Leaflet Web Mapping
 - [Lesson 2: Loading and Styling Data in a Leaflet Web Map](#lesson-2-loading-and-styling-data-in-a-leaflet-web-map)
   - [Using jQuery Ajax Methods to Load Data](#using-jquery-ajax-methods-to-load-data)
   - [Using the Web Console to Develop and Debug Maps with Live Server](#using-the-web-console-to-develop-and-debug-maps-with-live-server)
+  - [Layer Styling in Leaflet](#layer-styling-in-leaflet)
+  - [Adding Interactive Tooltip Content](#adding-interactive-tooltip-content)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -274,6 +276,8 @@ Save and refresh. Now, when you look at your map, you should see all the polygon
 ![Initial Visualization of the Data](images/initial-data-add.png)  
 **Figure 16**. Initial visualization of the data.
 
+### Layer Styling in Leaflet
+
 First, let's style these polygons so that the wildfires appear orange and the urban areas appear yellow. Change the code above to the following:
 
 ```js
@@ -317,6 +321,8 @@ After saving your code and refreshing your map in live server, you should now se
 
 ![Visualizing the Data by File](images/style-data-1.png)  
 **Figure 17**. Visualizing the data by source file.
+
+### Adding Interactive Tooltip Content
 
 Now, let's add a bit of user interaction. If you move your cursor across the map, you will notice that it changes as you hover over a polygon. Using Leaflet, we can make popup content appear to tell us more about each feature when we hover over them. We will need to return to console logging to determine what sort of information we might be able to add, as well as to test our code as we go. But first, we need to add a block of code after each segment pertaining to the style of our layers. Add the following "onEachFeature" block to your ongoing layer edits:
 
