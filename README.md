@@ -14,6 +14,7 @@ Online tutorials for Leaflet Web Mapping
   - [Using the Web Console to Develop and Debug Maps with Live Server](#using-the-web-console-to-develop-and-debug-maps-with-live-server)
   - [Layer Styling in Leaflet](#layer-styling-in-leaflet)
   - [Adding Interactive Tooltip Content](#adding-interactive-tooltip-content)
+  - [Lesson 2 Recap](#lesson-2-recap)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -512,3 +513,7 @@ After saving and refreshing, you should now see informative tooltip content when
 
 ![Interactive Tooltip Content](images/tooltip-content.png)  
 **Figure 21**. Interactive tooltip content.
+
+### Lesson 2 Recap
+
+In this lesson, we learned how to load GeoJSON data with jQuery ajax methods to visualize it on a web map. We took a look at using the web console to develop and debug maps with Atom Live Server. We examined how to style a polygon inside a Leaflet GeoJSON layer and looked at hex codes for coloring. Finally, we introduced some basic user interaction by adding layer tooltip content and using console logs to query the GeoJSON file structure and to access its internal data.
