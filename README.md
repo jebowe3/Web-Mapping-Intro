@@ -18,6 +18,7 @@ Online tutorials for Leaflet Web Mapping
 - [Lesson 3: Adding a Time Slider and Temporal Legend to Update the Data by Time](#lesson-3-adding-a-time-slider-and-temporal-legend-to-update-the-data-by-time)
   - [Adding a Time Slider](#adding-a-time-slider)
   - [Retrieving the Time Slider Inputs with JavaScript](#retrieving-the-time-slider-inputs-with-javascript)
+  - [Adding a Temporal Legend](#adding-a-temporal-legend)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -609,3 +610,60 @@ Save your code and refresh your map. If you have your web console open, you shou
 
 ![Logging Time Slider Inputs in the Web Console](images/year-log.png)
 **Figure 22**. Logging time slider inputs in the web console.
+
+It's nice to see that data in the console, but we need a casual map user to be able to see it on the map as they interact with the slider. We need to write a similar set of code to make a temporal legend that interacts with the time slider.
+
+### Adding a Temporal Legend
+
+In order to add a temporal legend, the first thing we need to do is to add another div to our HTML code just beneath that which added the time slider.
+
+```html
+<!-- the map -->
+<div id="map"></div>
+<!-- ui slider -->
+<div id="slider" class="leaflet-control">
+  <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+  <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+</div>
+<!-- temporal legend -->
+<div id='temporal'>
+  <h5 class='txt-bold'><span></span></h5>
+</div>
+```
+
+This will not result in any visible changes to your map, so don't worry if everything looks the same after saving and refreshing. Now, we need to add some CSS to style and position the temporal legend. Add this code just below the CSS for the time slider.
+
+```css
+/* Set time slider styles */
+#slider {
+  position: absolute;
+  height: 25px;
+  bottom: 10px;
+  left: 125px;
+  z-index: 1000;
+  background-color: #FFFFFF;
+  border-radius: 3px;
+  box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Set temporal legend styles */
+#temporal {
+  height: 25px;
+  bottom: 10px;
+  width: 86px;
+  background-color: #FFFFFF;
+  border-radius: 3px;
+  box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Set the styles for the text span in the temporal legend */
+#temporal span {
+  font-family: 'Montserrat', sans-serif;
+  position: absolute;
+  font-size: 13px;
+  bottom: 2px;
+  left: 10px;
+}
+```
+
+Notice that we have added two blocks of CSS code. The first one is for the legend itself, while the second one pertains to the text within the legend, which will display the selected year. Again, after saving and refreshing, you will not notice any changes to your map. We need to define and add a new function to add the legend to the map and get it to interact with the time slider.
