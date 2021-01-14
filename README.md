@@ -631,7 +631,7 @@ In order to add a temporal legend, the first thing we need to do is to add anoth
 </div>
 ```
 
-This will not result in any visible changes to your map, so don't worry if everything looks the same after saving and refreshing. Now, we need to add some CSS to style and position the temporal legend. Add this code just below the CSS for the time slider.
+This will not result in any visible changes to your map, so don't worry if everything looks the same after saving and refreshing. Now, we need to add some CSS to style the temporal legend. Add this code just below the CSS for the time slider.
 
 ```css
 /* Set time slider styles */
@@ -649,7 +649,6 @@ This will not result in any visible changes to your map, so don't worry if every
 /* Set temporal legend styles */
 #temporal {
   height: 25px;
-  bottom: 10px;
   width: 86px;
   background-color: #FFFFFF;
   border-radius: 3px;
@@ -667,3 +666,78 @@ This will not result in any visible changes to your map, so don't worry if every
 ```
 
 Notice that we have added two blocks of CSS code. The first one is for the legend itself, while the second one pertains to the text within the legend, which will display the selected year. Again, after saving and refreshing, you will not notice any changes to your map. We need to define and add a new function to add the legend to the map and get it to interact with the time slider.
+
+Let's call this new function "createTemporalLegend" and define what it does right after the "sequenceUI" function. We want the temporal legend to display the year selected by the time slider, so we will feed this function the "currentYear" value. The function should be written as follows:
+
+```js
+// call the UI slider with a function called "sequenceUI"
+function sequenceUI(wildfires) { // feed it the wildfires data
+
+  // use the jQuery ajax method to get the slider element
+  $('.slider')
+    .on('input change', function() { // when the input changes...
+      let currentYear = $(this).val(); // identify the year selected with "currentYear"
+      console.log(currentYear); // log the selected year to the console
+    });
+
+}; // End sequenceUI function
+
+// Add a temporal legend in sync with the UI slider
+function createTemporalLegend(currentYear) { // feed it the selected year
+
+  // define the temporal legend with a Leaflet control
+  const temporalLegend = L.control({
+    position: 'bottomleft' // place the temporal legend at bottom left corner
+  });
+
+  // when added to the map
+  temporalLegend.onAdd = function(map) {
+
+    const div = L.DomUtil.get("temporal"); // get the div
+
+    // disable the mouse events
+    L.DomEvent.addListener(div, 'mousedown', function(e) {
+      L.DomEvent.stopPropagation(e);
+    });
+
+    return div; // return the div from the function
+
+  }
+
+  $('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
+
+  temporalLegend.addTo(map); // add the temporal legend to the map
+
+}; // End createTemporalLegend function
+```
+
+In order for this code to do something, we need to add a few more lines. First, let's call this function within our "sequenceUI" function in place of the "console.log(currentYear)" code. This will allow for the year selected by the slider to be fed to the "createTemporalLegend" function. Edit your code as follows:
+
+```js
+// call the UI slider with a function called "sequenceUI"
+function sequenceUI(wildfires) { // feed it the wildfires data
+
+  // use the jQuery ajax method to get the slider element
+  $('.slider')
+    .on('input change', function() { // when the input changes...
+      let currentYear = $(this).val(); // identify the year selected with "currentYear"
+      createTemporalLegend(currentYear); // call the createTemporalLegend function
+    });
+
+}; // End sequenceUI function
+```
+
+Now, upon saving and refreshing, you will notice that the temporal legend appears to the left of your time slider as soon as you use the time slider. It works, but we want the legend to appear when the map loads before we use the slider. For this, we also need to define the time slider year and call the "createTemporalLegend" function within the first function that loads and processes our JSON data.
+
+```js
+}).addTo(map);
+
+// define the value in the slider when the map loads
+let currentYear = $('.slider').val();
+
+// call functions defined below
+sequenceUI(wildfires); // calls the time slider and sends the layer to it
+createTemporalLegend(currentYear); // calls the createTemporalLegend function
+```
+
+If you save your index.html and refresh the map, you should now see the temporal legend with the selected year upon loading the map. When you interact with the time slider, the year in the legend changes. This is great, but now we need to make the slider filter the wildfire data.
