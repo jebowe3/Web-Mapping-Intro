@@ -740,4 +740,211 @@ sequenceUI(wildfires); // calls the time slider and sends the layer to it
 createTemporalLegend(currentYear); // calls the createTemporalLegend function
 ```
 
+At this point, the entirety of your code within your index.html file should mirror this:
+
+```html
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <!-- Give the page a title -->
+  <title>California Wildfires</title>
+  <!-- Add a link to the Leaflet CSS library so you can reference it for styling your map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  <!-- All the CSS code goes inside the style tags below -->
+  <style>
+    /* style the body */
+    body {
+      margin: 0px;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* style the map */
+    #map {
+      position: absolute;
+      width: 100%;
+      top: 0px;
+      bottom: 0;
+    }
+
+    /* Set time slider styles */
+    #slider {
+      position: absolute;
+      height: 25px;
+      bottom: 10px;
+      left: 125px;
+      z-index: 1000;
+      background-color: #FFFFFF;
+      border-radius: 3px;
+      box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Set temporal legend styles */
+    #temporal {
+      height: 25px;
+      width: 86px;
+      background-color: #FFFFFF;
+      border-radius: 3px;
+      box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Set the styles for the text span in the temporal legend */
+    #temporal span {
+      font-family: 'Montserrat', sans-serif;
+      position: absolute;
+      font-size: 13px;
+      bottom: 2px;
+      left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- the map -->
+  <div id="map"></div>
+  <!-- ui slider -->
+  <div id="slider" class="leaflet-control">
+    <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+    <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+  </div>
+  <!-- temporal legend -->
+  <div id='temporal'>
+    <h5 class='txt-bold'><span></span></h5>
+  </div>
+  <!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <!-- Add a link to the jQuery JavaScript library so you can leverage ajax methods to load your data -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- All JavaScript goes inside the script tags below -->
+  <script>
+    // define map options
+    const mapOptions = {
+      zoomSnap: 0.5,  // this allows fractional zooming
+      center: [37.5, -120], // center the map on the coordinates for California
+      zoom: 6.5, // set the initial zoom
+    };
+
+    // define the map with the options above
+    const map = L.map("map", mapOptions);
+
+    // add a base map to the map
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20
+    }).addTo(map);
+
+    // use jquery to load wildfires GeoJSON data
+    $.when(
+      $.getJSON("data/California_Fire_Perimeters.json"),
+      $.getJSON("data/California_Urban.json"),
+    // when the files are done loading,
+    // identify them with names and process them through a function
+    ).done(function(caliFires, caliCities) {
+      // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+      const wildfires = L.geoJson(caliFires, {
+        // style the layer
+        style: function(feature) {
+          return {
+            fillColor: "orange", // set the polygon fill to orange
+            fillOpacity: 0.3, // give the polygon fill a 30% opacity
+            color: "orange", // set the outline color to orange
+            weight: 1.0, // give the outline a weight
+            opacity: 0.7 // give the outline 70% opacity
+          };
+        },
+        // for each feature...
+        onEachFeature: function(feature, layer) {
+          // define the tooltip info
+          let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
+          // bind the tooltip to the layer and add the content defined as "wildfireTooltip" above
+          layer.bindTooltip(wildfireTooltip, {
+            sticky: true,
+            className: "tooltip",
+          });
+        }
+      }).addTo(map);
+      // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+      const urban = L.geoJson(caliCities, {
+        // style the layer
+        style: function(feature) {
+          return {
+            fillColor: "yellow", // set the polygon fill to yellow
+            fillOpacity: 0.3, // give the polygon fill a 30% opacity
+            color: "yellow", // set the outline color to yellow
+            weight: 1.0, // give the outline a weight
+            opacity: 0.7 // give the outline 70% opacity
+          };
+        },
+        // for each feature...
+        onEachFeature: function(feature, layer) {
+          // define the tooltip info
+          let cityTooltip = layer.feature.properties.name10;
+          // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+          layer.bindTooltip(cityTooltip, {
+            sticky: true,
+            className: "tooltip",
+          });
+        }
+      }).addTo(map);
+
+      // define the value in the slider when the map loads
+      let currentYear = $('.slider').val();
+
+      // call functions defined below
+      sequenceUI(wildfires); // calls the time slider and sends the layer to it
+      createTemporalLegend(currentYear); // calls the createTemporalLegend function
+    });
+
+    // call the UI slider with a function called "sequenceUI"
+    function sequenceUI(wildfires) { // feed it the wildfires data
+
+      // use the jQuery ajax method to get the slider element
+      $('.slider')
+        .on('input change', function() { // when the input changes...
+          let currentYear = $(this).val(); // identify the year selected with "currentYear"
+          createTemporalLegend(currentYear); // call the createTemporalLegend function
+        });
+
+    }; // End sequenceUI function
+
+    // Add a temporal legend in sync with the UI slider
+    function createTemporalLegend(currentYear) { // feed it the selected year
+
+      // define the temporal legend with a Leaflet control
+      const temporalLegend = L.control({
+        position: 'bottomleft' // place the temporal legend at bottom left corner
+      });
+
+      // when added to the map
+      temporalLegend.onAdd = function(map) {
+
+        const div = L.DomUtil.get("temporal"); // get the div
+
+        // disable the mouse events
+        L.DomEvent.addListener(div, 'mousedown', function(e) {
+          L.DomEvent.stopPropagation(e);
+        });
+
+        return div; // return the div from the function
+
+      }
+
+      $('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
+
+      temporalLegend.addTo(map); // add the temporal legend to the map
+
+    }; // End createTemporalLegend function
+  </script>
+</body>
+
+</html>
+```
+
 If you save your index.html and refresh the map, you should now see the temporal legend with the selected year upon loading the map. When you interact with the time slider, the year in the legend changes. This is great, but now we need to make the slider filter the wildfire data.
+
+![The Time Slider and Temporal Legend](images/slider-time.png)
+**Figure 23**. The time slider and temporal legend.
