@@ -15,6 +15,9 @@ Online tutorials for Leaflet Web Mapping
   - [Layer Styling in Leaflet](#layer-styling-in-leaflet)
   - [Adding Interactive Tooltip Content](#adding-interactive-tooltip-content)
   - [Lesson 2 Recap](#lesson-2-recap)
+- [Lesson 3: Adding a Time Slider and Temporal Legend to Update the Data by Time](#lesson-3-adding-a-time-slider-and-temporal-legend-to-update-the-data-by-time)
+  - [Adding a Time Slider](#adding-a-time-slider)
+  - [Retrieving the Time Slider Inputs with JavaScript](#retrieving-the-time-slider-inputs-with-javascript)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -517,3 +520,92 @@ After saving and refreshing, you should now see informative tooltip content when
 ### Lesson 2 Recap
 
 In this lesson, we learned how to load GeoJSON data with jQuery ajax methods to visualize it on a web map. We took a look at using the web console to develop and debug maps with Atom Live Server. We examined how to style a polygon inside a Leaflet GeoJSON layer and looked at hex codes for coloring. Finally, we introduced some basic user interaction by adding layer tooltip content and using console logs to query the GeoJSON file structure and to access its internal data.
+
+## Lesson 3: Adding a Time Slider and Temporal Legend to Update the Data by Time
+
+When we added the tooltip content to our map, we noticed that each wildfire had a time stamp. It would be nice if we could filter our data to display wildfires by year so that we can compare acres burned annually and see if we can discern any trend over the last decade. As it happens, there is a way to filter the visibility of our wildfire data with an interactive time slider element and we will see how to do it in this lesson.
+
+### Adding a Time Slider
+
+First, let's add a time slider. This will require coding a new div into our page. Open the map project in Atom and open the index.html file. Within the <body> tags of your HTML code, you will insert a new div we will call "slider" just beneath the one called "map".
+
+```html
+<!-- the map -->
+<div id="map"></div>
+<!-- ui slider -->
+<div id="slider" class="leaflet-control">
+  <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+  <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+</div>
+```
+
+We give ids to these divs so that we can reference them in our CSS and JavaScript scripting. Also, you will notice that we have defined the input as a range of values from 2010 to 2019 with increments (steps) of 1. These correspond to the range of years covered by our wildfire data. If you save these edits and refresh your map in live server, you might notice a rudimentary slider element lurking in the upper left corner behind the zoom controls. We need to add some CSS code to improve upon the appearance and to reposition it. Within the <style> tags of your HTML code, include some CSS code for the slider just beneath the CSS that styles the map.
+
+```css
+/* the map */
+#map {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  bottom: 0;
+}
+
+/* Set time slider styles */
+#slider {
+  position: absolute;
+  height: 25px;
+  bottom: 10px;
+  left: 125px;
+  z-index: 1000;
+  background-color: #FFFFFF;
+  border-radius: 3px;
+  box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+}
+```
+
+Notice that you referenced the slider element using its div id by typing "#slider", just as you did for the map in the CSS above it. Within the curly brackets, you fed the script some details about where the slider should be located and how it should appear. Feel free to fiddle around with these settings so that you can understand what these options do. You can also research other CSS options you can use by searching online. Now, if you save your code and refresh your map, you should see a fully styled slider in the bottom left corner of your map. We have not yet added a temporal legend, nor have we added any code to make this slider talk to our wildfire data. You can move the slider, but it doesn't do anything!
+
+### Retrieving the Time Slider Inputs with JavaScript
+
+The first thing we need to do in order to make the time slider work with the data is to add some JavaScript to retrieve the year from the time slider. Though it may not look like it is doing anything, every time you move the time slider, the position corresponds to a year in the range you fed it with your HTML code. We need to get that year.
+
+To do this, we need to write a function. This function will go just beneath the semicolon ending the function that processes our JSON data and we will call it "sequenceUI". Know that you could call the function anything you want, as long as you remain consistent when calling it. Copy and paste the following function just beneath the semicolon ending the function that processes our JSON data and just before the closing </script> tag.
+
+```js
+// call the UI slider with a function called "sequenceUI"
+function sequenceUI(wildfires) { // feed it the wildfires data
+
+  // use the jQuery ajax method to get the slider element
+  $('.slider')
+    .on('input change', function() { // when the input changes...
+      let currentYear = $(this).val(); // identify the year selected with "currentYear"
+    });
+
+}; // End sequenceUI function
+```
+
+Notice that, in defining this function, you have fed it the wildfires data with "function sequenceUI(wildfires)". This is because you want the time slider to interact with this data. However, there is one more step needed to feed this data to this function. At this time, this function can't actually read this data because it is contained within the function above it. Therefore, we need to call the new "sequenceUI" function within the function above it, which contains and processes the wildfire data.
+
+```js
+  }).addTo(map);
+
+  // call functions defined below
+  sequenceUI(wildfires); // calls the time slider and sends the layer to it
+});
+```
+
+Now, let's make sure everything is working properly. Open the web console on live server, return to the index.html file and include the following console log command in your "sequenceUI" function:
+
+```js
+// use the jQuery ajax method to get the slider element
+$('.slider')
+  .on('input change', function() { // when the input changes...
+    let currentYear = $(this).val(); // identify the year selected with "currentYear"
+    console.log(currentYear); // log the selected year to the console
+  });
+```
+
+Save your code and refresh your map. If you have your web console open, you should notice it logging the year every time you change the position of your time slider.
+
+![Logging Time Slider Inputs in the Web Console](images/year-log.png)
+**Figure 22**. Logging time slider inputs in the web console.
