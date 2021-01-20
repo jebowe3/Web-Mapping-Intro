@@ -19,6 +19,7 @@ Online tutorials for Leaflet Web Mapping
   - [Adding a Time Slider](#adding-a-time-slider)
   - [Retrieving the Time Slider Inputs with JavaScript](#retrieving-the-time-slider-inputs-with-javascript)
   - [Adding a Temporal Legend](#adding-a-temporal-legend)
+  - [Lesson 3 Recap](#lesson-3-recap)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -944,7 +945,11 @@ At this point, the entirety of your code within your index.html file should mirr
 </html>
 ```
 
-If you save your index.html and refresh the map, you should now see the temporal legend with the selected year upon loading the map. When you interact with the time slider, the year in the legend changes. This is great, but now we need to make the slider filter the wildfire data.
+If you save your index.html and refresh the map, you should now see the temporal legend with the selected year upon loading the map. When you interact with the time slider, the year in the legend changes.
 
 ![The Time Slider and Temporal Legend](images/slider-time.png)
 **Figure 23**. The time slider and temporal legend.
+
+### Lesson 3 Recap
+
+Let's review what we learned. In this lesson, you learned how to create a time slider and temporal legend. You also learned how to use JavaScript to get the dates from the interactive time slider. You learned how to style these elements with CSS. You also learned how to define functions and to call them to thread them through other functions. In this case, you were able to use this to access the dates from the time slider within the function that activated the temporal legend. Now we need to make the slider filter the wildfire data.
