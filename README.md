@@ -20,6 +20,8 @@ Online tutorials for Leaflet Web Mapping
   - [Retrieving the Time Slider Inputs with JavaScript](#retrieving-the-time-slider-inputs-with-javascript)
   - [Adding a Temporal Legend](#adding-a-temporal-legend)
   - [Lesson 3 Recap](#lesson-3-recap)
+- [Lesson 4: Write a Function to Update the Data with the Time Slider](#lesson-4-write-a-function-to-update-the-data-with-the-time-slider)
+  -[Initialize a Data Update Function to Handle Years Selected and Wildfire Data](#initialize-a-data-update-function-to-handle-years-selected-and-wildfire-data)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -525,7 +527,7 @@ In this lesson, we learned how to load GeoJSON data with jQuery ajax methods to 
 
 ## Lesson 3: Adding a Time Slider and Temporal Legend to Update the Data by Time
 
-When we added the tooltip content to our map, we noticed that each wildfire had a time stamp. It would be nice if we could filter our data to display wildfires by year so that we can compare acres burned annually and see if we can discern any trend over the last decade. As it happens, there is a way to filter the visibility of our wildfire data with an interactive time slider element and we will see how to do it in this lesson.
+When we added the tooltip content to our map, we noticed that each wildfire had a time stamp. It would be nice if we could filter our data to display wildfires by year so that we can compare acres burned annually and see if we can discern any trend over the last decade. As it happens, there is a way to filter the visibility of our wildfire data with an interactive time slider element and we will see how to make one in this lesson.
 
 ### Adding a Time Slider
 
@@ -953,3 +955,55 @@ If you save your index.html and refresh the map, you should now see the temporal
 ### Lesson 3 Recap
 
 Let's review what we learned. In this lesson, you learned how to create a time slider and temporal legend. You also learned how to use JavaScript to get the dates from the interactive time slider. You learned how to style these elements with CSS. You also learned how to define functions and to call them to thread them through other functions. In this case, you were able to use this to access the dates from the time slider within the function that activated the temporal legend. Now we need to make the slider filter the wildfire data.
+
+## Lesson 4: Write a Function to Update the Data with the Time Slider
+
+In the previous lesson, we created an interactive time slider, which works with a temporal legend to display the user-selected year. In this lesson, we will develop this a bit further to make the time slider filter the wildfire data according to the selected year.
+
+### Initialize a Data Update Function to Handle Years Selected and Wildfire Data
+
+The first thing we need to do is to write a new function for updating the wildfire data. Just beneath the end of the "createTemporalLegend" function, define a new function called "updateFires." Begin writing this function as follows:
+
+```js
+// Define updateFires function and feed it the wildfire data and the user-selected year
+function updateFires(wildfires, currentYear) {
+  // access each layer in the wildfire data
+  wildfires.eachLayer(function(layer) {
+    // log the properties for each feature to the web console
+    console.log(layer.feature.properties);
+    // log the user-selected year
+    console.log(currentYear);
+  });
+}; // End updateFires function
+```
+
+Remember that this function will not work until you call it within the functions where you have access to the wildfire data and the user-selected year. First, call the function at the end of the function that initially processes our data files, just after the "createTemporalLegend" function.
+
+```js
+// define the value in the slider when the map loads
+let currentYear = $('.slider').val();
+
+// call functions defined below
+sequenceUI(wildfires); // calls the time slider and sends the layer to it
+createTemporalLegend(currentYear); // calls the createTemporalLegend function
+updateFires(wildfires, currentYear); // updates the layer according to the slider year upon loading
+```
+
+Calling the function here gives it access to the wildfire data, but it also gives it access to the year selected by the slider upon initial loading. Next, we need to call this function within the "sequenceUI" function in order to give the function access to the updated slider year whenever the user interacts with the slider.
+
+```js
+// call the UI slider with a function called "sequenceUI"
+function sequenceUI(wildfires) { // feed it the wildfires data
+
+  // use the jQuery ajax method to get the slider element
+  $('.slider')
+    .on('input change', function() { // when the input changes...
+      let currentYear = $(this).val(); // identify the year selected with "currentYear"
+      createTemporalLegend(currentYear); // call the createTemporalLegend function
+      updateFires(wildfires, currentYear); // updates the layer according to the year selected by the slider
+    });
+
+}; // End sequenceUI function
+```
+
+After saving these edits and refreshing your map, check the web console and notice how your console logs written within your "updateFires" function demonstrate that you have access to the properties of each individual wildfire polygon, as well as the years selected by the interactive time slider.
