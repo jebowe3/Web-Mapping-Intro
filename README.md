@@ -1057,6 +1057,37 @@ Upon saving your coding edits and refreshing your map, you should now see your w
 
 First,
 ```js
-let year = layer.feature.properties.YEAR_
-``` 
-identifies the property containing each feature's year with "year". Next, you identified the tooltip content with `let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned"`. Beneath this, you created a conditional test with `if (year == currentYear) {}`. This is telling your app to check if the map feature's year matches the time slider year and, if so, to do what follows. If this conditional test is passed, `layer.addTo(map)` adds the layer to the map, thereby adding only the content that matches the time slider year. The following code, `layer.bindTooltip(wildfireTooltip)`, attaches the tooltip info to each wildfire polygon. This info appears automatically when you hover over it with your mouse. However, a few mouseover changes need to be implemented directly with `layer.on("mouseover")`. Here, you changed the fill and line opacity so there would be a subtle change to the polygon when hovering over it. You also need to tell the app to revert to the initial style settings on mouseout with `layer.on("mouseout")`. Finally, you need to tell the map app to remove the layer if the conditional test is not met (if the wildfire year does not match the time slider year) with `else {map.removeLayer(layer);}`.
+let year = layer.feature.properties.YEAR_;
+```
+identifies the property containing each feature's year with "year".
+
+Next, you identified the tooltip content with:
+```js
+let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
+```
+Beneath this, you created a conditional test with
+```js
+if (year == currentYear) {}
+```
+This is telling your app to check if the map feature's year matches the time slider year and, if so, to do what follows. If this conditional test is passed,
+```js
+layer.addTo(map);
+```
+adds the layer to the map, thereby adding only the content that matches the time slider year. The following code,
+```js
+layer.bindTooltip(wildfireTooltip);
+```
+attaches the tooltip info to each wildfire polygon. This info appears automatically when you hover over it with your mouse. However, a few mouseover changes need to be implemented directly with:
+```js
+layer.on("mouseover");
+```
+Here, you changed the fill and line opacity so there would be a subtle change to the polygon when hovering over it. You also need to tell the app to revert to the initial style settings on mouseout with:
+```js
+layer.on("mouseout");
+```
+Finally, you need to tell the map app to remove the layer if the conditional test is not met (if the wildfire year does not match the time slider year) with:
+```js
+else {
+  map.removeLayer(layer);
+};
+```
