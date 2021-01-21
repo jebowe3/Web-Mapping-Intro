@@ -23,6 +23,8 @@ Online tutorials for Leaflet Web Mapping
 - [Lesson 4: Write a Function to Update the Data with the Time Slider](#lesson-4-write-a-function-to-update-the-data-with-the-time-slider)
   - [Initialize a Data Update Function to Handle Years Selected and Wildfire Data](#initialize-a-data-update-function-to-handle-years-selected-and-wildfire-data)
   - [Editing the Function to Make the Time Slider Update the Wildfire Data](#editing-the-function-to-make-the-time-slider-update-the-wildfire-data)
+  - [Finalizing the City Layer](#finalizing-the-city-layer)
+  - [Adding a Title and Scale Bar](#adding-a-title-and-scale-bar)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -305,7 +307,7 @@ $.when(
         fillColor: "orange", // set the polygon fill to orange
         fillOpacity: 0.3, // give the polygon fill a 30% opacity
         color: "orange", // set the outline color to orange
-        weight: 1.0, // give the outline a weight
+        weight: 1.2, // give the outline a weight
         opacity: 0.7 // give the outline 70% opacity
       };
     }
@@ -351,7 +353,7 @@ $.when(
         fillColor: "orange", // set the polygon fill to orange
         fillOpacity: 0.3, // give the polygon fill a 30% opacity
         color: "orange", // set the outline color to orange
-        weight: 1.0, // give the outline a weight
+        weight: 1.2, // give the outline a weight
         opacity: 0.7 // give the outline 70% opacity
       };
     },
@@ -405,7 +407,7 @@ $.when(
         fillColor: "orange", // set the polygon fill to orange
         fillOpacity: 0.3, // give the polygon fill a 30% opacity
         color: "orange", // set the outline color to orange
-        weight: 1.0, // give the outline a weight
+        weight: 1.2, // give the outline a weight
         opacity: 0.7 // give the outline 70% opacity
       };
     },
@@ -476,7 +478,7 @@ $.when(
         fillColor: "orange", // set the polygon fill to orange
         fillOpacity: 0.3, // give the polygon fill a 30% opacity
         color: "orange", // set the outline color to orange
-        weight: 1.0, // give the outline a weight
+        weight: 1.2, // give the outline a weight
         opacity: 0.7 // give the outline 70% opacity
       };
     },
@@ -856,7 +858,7 @@ At this point, the entirety of your code within your index.html file should mirr
             fillColor: "orange", // set the polygon fill to orange
             fillOpacity: 0.3, // give the polygon fill a 30% opacity
             color: "orange", // set the outline color to orange
-            weight: 1.0, // give the outline a weight
+            weight: 1.2, // give the outline a weight
             opacity: 0.7 // give the outline 70% opacity
           };
         },
@@ -1094,3 +1096,243 @@ else {
   map.removeLayer(layer);
 };
 ```
+
+### Finalizing the City Layer
+
+The map is looking better, but it would be nice to have a way to make the city layer appear and disappear on demand. For this, we need to add a layer control. Within the initial function that processes our JSON files, add some code to define the layers for the layer control as well as the layer control just after the code that adds the urban areas to the map.
+
+```js
+// initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+const urban = L.geoJson(caliCities, {
+  // style the layer
+  style: function(feature) {
+    return {
+      fillColor: "yellow", // set the polygon fill to yellow
+      fillOpacity: 0.3, // give the polygon fill a 30% opacity
+      color: "yellow", // set the outline color to yellow
+      weight: 1.0, // give the outline a weight
+      opacity: 0.7 // give the outline 70% opacity
+    };
+  },
+  // for each feature...
+  onEachFeature: function(feature, layer) {
+    // define the tooltip info
+    let cityTooltip = layer.feature.properties.name10;
+    // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+    layer.bindTooltip(cityTooltip, {
+      sticky: true,
+      className: "tooltip",
+    });
+  }
+}).addTo(map);
+
+// define layers for layer control
+const controlLayers = {
+  "Urban Areas": urban,
+};
+
+// send the layers to the layer control
+L.control.layers(null, controlLayers, {
+  collapsed: false,
+  position: 'topleft',
+}).addTo(map);
+
+// define the value in the slider when the map loads
+let currentYear = $('.slider').val();
+```
+
+Inside the Leaflet method that generates the layer control, `L.control.layers(null, controlLayers)`, you will notice that one of the options is left null. This is because this option is for base layers, which we do not have. The next option is for overlays (here defined as "controlLayers"), of which we have one (the cities layer). Also notice that we have defined the position of the layer control at "topleft". The default position is "topright", but we will be placing an analytical graph there, so we don't want our layer control to conflict with that. Also notice that you can set your layer control to `collapsed: true` if you want a collapsible layer control.
+
+Finally, notice how there is no subtle style change in your urban areas layer on mouseover. Let's change this. In the first function that handles our JSON files, we need to add a `layer.on("mouseover")` and a `layer.on("mouseout")` method after the `layer.bindTooltip(cityTooltip)` method we have already written for our urban area data. The code that styles your cities GeoJSON layer should be changed to look like this:
+
+```js
+// initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+const urban = L.geoJson(caliCities, {
+  // style the layer
+  style: function(feature) {
+    return {
+      fillColor: "yellow", // set the polygon fill to yellow
+      fillOpacity: 0.3, // give the polygon fill a 30% opacity
+      color: "yellow", // set the outline color to yellow
+      weight: 1.0, // give the outline a weight
+      opacity: 0.7 // give the outline 70% opacity
+    };
+  },
+  // for each feature...
+  onEachFeature: function(feature, layer) {
+    // define the tooltip info
+    let cityTooltip = layer.feature.properties.name10;
+    // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+    layer.bindTooltip(cityTooltip, {
+      sticky: true,
+      className: "tooltip",
+    });
+    //define what happens on mouseover
+    layer.on("mouseover", function(e) {
+      layer.setStyle({
+        fillOpacity: 0.7,
+        opacity: 1.0
+      });
+    });
+    //define what happens on mouseout
+    layer.on("mouseout", function(e) {
+      layer.setStyle({
+        fillOpacity: 0.3,
+        opacity: 0.7
+      });
+    });
+  }
+}).addTo(map);
+```
+
+Now, save these edits and refresh your map in live server. You should now see a nice style change in your cities layer to indicate when you have hovered over it.
+
+![Hovering Over a City Changes Its Style](images/LA-hover.png)
+**Figure 25**. Hovering over a city changes its style.
+
+### Adding a Title and Scale Bar (and a More In-Depth Look at CSS)
+
+Before we conclude this lesson, let's add a scale bar and a title to our map. Adding a scale bar is easy with Leaflet. Just add a `L.control.scale()` method between the code that adds the base map and the code that loads the GeoJSON data. The resulting code should look like this:
+
+```js
+// add a base map to the map
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 20
+}).addTo(map);
+
+// Add a scale bar
+L.control.scale({
+  position: 'bottomright' // Position the scale bar at the bottom-right corner
+}).addTo(map);
+
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function
+)
+```
+
+Upon saving these edits and refreshing the map, you should now see a dynamic scale bar in the bottom right corner of the map.
+
+Now for the title bar. For this, we will need a new html header element. Just after the initial <body> html tag, and just before the map div, include the following html code (replace my name with yours):
+
+```html
+<!-- header -->
+<header>
+  <h1>California Wildfires and Cities, 2010 - 2019</h1><br>
+  <h2>Map by Jay Bowen; Data courtesy of <a href ="https://hub.arcgis.com/datasets/653647b20bc74480b335e31d6d81a52f/data?geometry=-151.022%2C31.426%2C-87.741%2C43.578&layer=1" style="color:blue;">ArcGIS Hub</a> and <a href ="https://geodata.lib.berkeley.edu/catalog/stanford-jt346pj7452" style="color:blue;">Berkeley Library Geodata</a></h2>
+</header>
+<!-- the map -->
+<div id="map"></div>
+```
+
+Great. Now we need to add some css to style it and make it appear on the map. Within the <style> tags, just after the body css, add some css for the header:
+
+```css
+/* style the body */
+body {
+  margin: 0px;
+  height: 100%;
+  width: 100%;
+}
+
+/* style header */
+header {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 447px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 1.0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  z-index: 800;
+}
+```
+
+This will place the header in the top left corner, 10 pixels from either edge. It will also define the width and height of the header. It will give the header a white background and slightly rounded edges. It also ensures it will appear over the map by defining the z-index.
+
+If you save these edits and refresh your map, you will notice a few issues.
+
+![Header Issues](images/header-issues.png)
+**Figure 26**. Header issues.
+
+First, the text exceeds the size of the header. We can correct this with some more css coding to style the text within the <h1> and <h2> tags. After the header css, add the following css code:
+
+```css
+/* style header */
+header {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 447px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 1.0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  z-index: 800;
+}
+
+/* the text inputs */
+h1 {
+  color: black;
+  font-size: 18px;
+  display: inline-block;
+  margin-top: 0.25em;
+  margin-bottom: 0.0em;
+  margin-left: 0.5em;
+  margin-right: 0;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+h2 {
+  font-size: 12px;
+  color: black;
+  display: inline-block;
+  margin-top: 0.0em;
+  margin-bottom: 0.0em;
+  margin-left: 0.75em;
+  margin-right: 0;
+  font-weight: normal;
+}
+```
+
+That looks better, but the header is crashing into the zoom control. We need some more css to reposition the zoom control and the layer control to clean up the top left corner. Place the following css code after the temporal span css code block:
+
+```css
+/* Set the styles for the text span in the temporal legend */
+#temporal span {
+  font-family: 'Montserrat', sans-serif;
+  position: absolute;
+  font-size: 13px;
+  bottom: 2px;
+  left: 10px;
+}
+
+/* the layer control */
+.leaflet-control-layers {
+  position: absolute;
+  width: 91px;
+  left: 50px;
+  top: 60px
+}
+
+/* the zoom control */
+.leaflet-top {
+  bottom: 0;
+}
+
+.leaflet-top .leaflet-control-zoom {
+  top: 60px;
+}
+```
+
+Now, if you save your edits and refresh the map, you should see something like this in the top left corner of your map:
+
+![Corrected Header](images/corrected-header.png)
+**Figure 27**. Corrected header.
