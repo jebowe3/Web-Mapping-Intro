@@ -1065,7 +1065,7 @@ Next, you identified the tooltip content with:
 ```js
 let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
 ```
-Beneath this, you created a conditional test with
+Beneath this, you created a conditional test with:
 ```js
 if (year == currentYear) {}
 ```
