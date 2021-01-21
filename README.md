@@ -24,7 +24,7 @@ Online tutorials for Leaflet Web Mapping
   - [Initialize a Data Update Function to Handle Years Selected and Wildfire Data](#initialize-a-data-update-function-to-handle-years-selected-and-wildfire-data)
   - [Editing the Function to Make the Time Slider Update the Wildfire Data](#editing-the-function-to-make-the-time-slider-update-the-wildfire-data)
   - [Finalizing the City Layer](#finalizing-the-city-layer)
-  - [Adding a Title and Scale Bar](#adding-a-title-and-scale-bar)
+  - [Adding a Title and Scale Bar (and a More In-Depth Look at CSS)](#adding-a-title-and-scale-bar-and-a-more-in-depth-look-at-css)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
