@@ -1009,6 +1009,9 @@ function sequenceUI(wildfires) { // feed it the wildfires data
 
 After saving these edits and refreshing your map, check the web console and notice how your console logs written within your "updateFires" function demonstrate that you have access to the properties of each individual wildfire polygon, as well as the years selected by the interactive time slider. We need to elaborate upon our "updateFires" function to reveal the layers when their year property matches the selected year and to remove them when they do not match.
 
+![Logging the User-Selected Year and the Properties of Each Wildfire](images/wildfire-props-log.png)
+**Figure 24**. Logging the user-selected year and the properties of each wildfire.
+
 ### Editing the Function to Make the Time Slider Update the Wildfire Data
 
 Returning to the "updateFires" function where you included two console logs, replace the log commands so that the complete function is defined as follows:
