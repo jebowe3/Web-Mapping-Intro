@@ -615,6 +615,7 @@ $('.slider')
 Save your code and refresh your map. If you have your web console open, you should notice it logging the year every time you change the position of your time slider.
 
 ![Logging Time Slider Inputs in the Web Console](images/year-log.png)
+
 **Figure 22**. Logging time slider inputs in the web console.
 
 It's nice to see that data in the console, but we need a casual map user to be able to see it on the map as they interact with the slider. We need to write a similar set of code to make a temporal legend that interacts with the time slider.
