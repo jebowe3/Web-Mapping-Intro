@@ -21,7 +21,8 @@ Online tutorials for Leaflet Web Mapping
   - [Adding a Temporal Legend](#adding-a-temporal-legend)
   - [Lesson 3 Recap](#lesson-3-recap)
 - [Lesson 4: Write a Function to Update the Data with the Time Slider](#lesson-4-write-a-function-to-update-the-data-with-the-time-slider)
-  -[Initialize a Data Update Function to Handle Years Selected and Wildfire Data](#initialize-a-data-update-function-to-handle-years-selected-and-wildfire-data)
+  - [Initialize a Data Update Function to Handle Years Selected and Wildfire Data](#initialize-a-data-update-function-to-handle-years-selected-and-wildfire-data)
+  - [Editing the Function to Make the Time Slider Update the Wildfire Data](#editing-the-function-to-make-the-time-slider-update-the-wildfire-data)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -1006,4 +1007,50 @@ function sequenceUI(wildfires) { // feed it the wildfires data
 }; // End sequenceUI function
 ```
 
-After saving these edits and refreshing your map, check the web console and notice how your console logs written within your "updateFires" function demonstrate that you have access to the properties of each individual wildfire polygon, as well as the years selected by the interactive time slider.
+After saving these edits and refreshing your map, check the web console and notice how your console logs written within your "updateFires" function demonstrate that you have access to the properties of each individual wildfire polygon, as well as the years selected by the interactive time slider. We need to elaborate upon our "updateFires" function to reveal the layers when their year property matches the selected year and to remove them when they do not match.
+
+### Editing the Function to Make the Time Slider Update the Wildfire Data
+
+Returning to the "updateFires" function where you included two console logs, replace the log commands so that the complete function is defined as follows:
+
+```js
+// Define updateFires function and feed it the wildfire data and the user-selected year
+function updateFires(wildfires, currentYear) {
+  // access each layer in the wildfire data
+  wildfires.eachLayer(function(layer) {
+    // define the wildfire year
+    let year = layer.feature.properties.YEAR_;
+    // define the tooltip info
+    let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
+    // use conditional logic to test if the layer properties match the time slider year
+    if (year == currentYear) {
+      // if there is a match, add the wildfires layer to the map
+      layer.addTo(map);
+      // bind the tooltip to the layer and add the content defined as "wildfireTooltip" above
+      layer.bindTooltip(wildfireTooltip, {
+        sticky: true,
+        className: "tooltip",
+      });
+      // change the layer style on mouseover
+      layer.on("mouseover", function(e) {
+        this.setStyle({
+          fillOpacity: 0.7,
+          opacity: 1.0
+        });
+      });
+      // use existing option to reset the styles on mouseout
+      layer.on("mouseout", function(e) {
+        this.setStyle({
+          fillOpacity: 0.3,
+          opacity: 0.7
+        });
+      });
+    } else {
+      // otherwise, remove the layer from the map
+      map.removeLayer(layer);
+    };
+  });
+}; // End updateFires function
+```
+
+Upon saving your coding edits and refreshing your map, you should now see your wildfire layer change as you move the time slider left and right. What is happening in this code you just pasted into your index.html file? First, `let year = layer.feature.properties.YEAR_` identifies the property containing each feature's year with "year". Next, you identified the tooltip content with `let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned"`. Beneath this, you created a conditional test with `if (year == currentYear) {}`. This is telling your app to check if the map feature's year matches the time slider year and, if so, to do what follows. If this conditional test is passed, `layer.addTo(map)` adds the layer to the map, thereby adding only the content that matches the time slider year. The following code, `layer.bindTooltip(wildfireTooltip)`, attaches the tooltip info to each wildfire polygon. This info appears automatically when you hover over it with your mouse. However, a few mouseover changes need to be implemented directly with `layer.on("mouseover")`. Here, you changed the fill and line opacity so there would be a subtle change to the polygon when hovering over it. You also need to tell the app to revert to the initial style settings on mouseout with `layer.on("mouseout")`. Finally, you need to tell the map app to remove the layer if the conditional test is not met (if the wildfire year does not match the time slider year) with `else {map.removeLayer(layer);}`.
