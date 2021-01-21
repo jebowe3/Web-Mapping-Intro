@@ -954,6 +954,7 @@ At this point, the entirety of your code within your index.html file should mirr
 If you save your index.html and refresh the map, you should now see the temporal legend with the selected year upon loading the map. When you interact with the time slider, the year in the legend changes.
 
 ![The Time Slider and Temporal Legend](images/slider-time.png)
+
 **Figure 23**. The time slider and temporal legend.
 
 ### Lesson 3 Recap
@@ -1189,6 +1190,7 @@ const urban = L.geoJson(caliCities, {
 Now, save these edits and refresh your map in live server. You should now see a nice style change in your cities layer to indicate when you have hovered over it.
 
 ![Hovering Over a City Changes Its Style](images/LA-hover.png)
+
 **Figure 25**. Hovering over a city changes its style.
 
 ### Adding a Title and Scale Bar (and a More In-Depth Look at CSS)
@@ -1260,9 +1262,10 @@ This will place the header in the top left corner, 10 pixels from either edge. I
 If you save these edits and refresh your map, you will notice a few issues.
 
 ![Header Issues](images/header-issues.png)
+
 **Figure 26**. Header issues.
 
-First, the text exceeds the size of the header. We can correct this with some more css coding to style the text within the <h1> and <h2> tags. After the header css, add the following css code:
+First, the text exceeds the size of the header. We can correct this with some more css coding to style the text within the h1 and h2 tags. After the header css, add the following css code:
 
 ```css
 /* style header */
@@ -1336,4 +1339,5 @@ That looks better, but the header is crashing into the zoom control. We need som
 Now, if you save your edits and refresh the map, you should see something like this in the top left corner of your map:
 
 ![Corrected Header](images/corrected-header.png)
+
 **Figure 27**. Corrected header.
