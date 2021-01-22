@@ -27,6 +27,8 @@ Online tutorials for Leaflet Web Mapping
   - [Adding a Title and Scale Bar (and a More In-Depth Look at CSS)](#adding-a-title-and-scale-bar-and-a-more-in-depth-look-at-css)
   - [Lesson 4 Recap](#lesson-4-recap)
 - [Lesson 5: Add an Analytical Line Graph and Publish Map With GitHub](#lesson-5-add-an-analytical-line-graph-and-publish-map-with-github)
+  - [Wrangling the Data for the Graph](#wrangling-the-data-for-the-graph)
+  - [Building the Graph](#building-the-graph)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -1525,4 +1527,148 @@ Now, save your code edits, open web console, and refresh your map. You should se
 
 **Figure 28**. Acres burned array.
 
-Nice!
+Good. Now that we have these values, we are ready to start working on the graph. Go ahead and delete `console.log(areasBurned);` from your index.html document.
+
+### Building the Graph
+
+The graph will require a link to yet another JavaScript library called [ApexCharts](https://apexcharts.com/). By now, you may be wondering how you know when to use a certain library. At first, you won't! As you build a web map, you may have an idea for something you would like to do, say a succinct visual like a chart, to make your data more legible and interactive. A JavaScript library might already exist to make this process a thousand times easier than trying to build the wheel yourself. Always look around the web for possible solutions before you try to tackle a difficult task!
+
+Just below where you linked to the Simple Statistics library, add a link to the ApexCharts library.
+
+```html
+<!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+<!-- Add a link to the jQuery JavaScript library so you can leverage ajax methods to load your data -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- for statistics, classifications -->
+<script src="https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js"></script>
+<!-- apex charts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+```
+
+Now, we need to write a final function to make our graph. At the very end of the JavaScript, where the "updateFires" function ends, write a new function called "renderChart".
+
+```js
+// Define the renderChart function
+function renderChart() {
+
+  // define the chart options
+  const options = {
+    chart: {
+      type: 'area',
+      zoom: {
+        enabled: false
+      }
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'straight'
+    },
+    title: {
+      text: 'Total Acres Burned',
+      align: 'left'
+    },
+    series: [{
+      name: 'acres burned',
+      // use the areasBurned array for the data
+      data: areasBurned
+    }],
+    xaxis: {
+      // use the sorted array years as the categories
+      categories: years
+    }
+  }
+  // define the chart
+  const chart = new ApexCharts(document.querySelector("#chart"), options);
+  // draw it on the page
+  chart.render();
+
+}; // End renderChart function
+```
+
+To understand more about this code, you can review the documentation for area charts at the [ApexCharts site](https://apexcharts.com/javascript-chart-demos/area-charts/basic/). You will find that, when you use a new libary, you may need to dig into some pretty substantial documentation to find exactly what you want.
+
+At this point, we have inserted the code that renders our graph/chart, but we need to call this function within the first function that handles our JSON data. Add a call for `renderChart` here:
+
+```js
+// call functions defined below
+sequenceUI(wildfires); // calls the time slider and sends the layer to it
+createTemporalLegend(currentYear); // calls the createTemporalLegend function
+updateFires(wildfires, currentYear); // updates the layer according to the slider year upon loading
+renderChart(); // creates the total acres burned chart
+```
+
+If you save your code and refresh your map, you will see an error message (`Uncaught (in promise) Error: Element not found`) in the web console. This is because we still need write an html div to create the chart element. Towards the top of our index.html document, right beneath the html code that defines the temporal legend, let's add some new code to create the chart element with the id of "chart". Also take note of the defined div classes. These identifiers will become important in just a bit, when we style this element with some more css.
+
+```html
+<!-- the map -->
+<div id="map"></div>
+<!-- ui slider -->
+<div id="slider" class="leaflet-control">
+  <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+  <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+</div>
+<!-- temporal legend -->
+<div id='temporal'>
+  <h5 class='txt-bold'><span></span></h5>
+</div>
+<!-- the area chart -->
+<div class="map-overlay container">
+  <div class="map-overlay-inner">
+    <div id="chart"></div>
+  </div>
+</div>
+```
+
+Saving and refreshing your map will demonstrate some humorous results. The chart has been added, but it is way too large and improperly located. We need some css to rescue this debacle. Let's add some new css just after the code that styles the temporal legend and just before the code that repositions the layer control, as shown below (focus on `#chart`, `.map-overlay`, and `.map-overlay .map-overlay-inner`).
+
+```css
+/* Set the styles for the text span in the temporal legend */
+#temporal span {
+  font-family: 'Montserrat', sans-serif;
+  position: absolute;
+  font-size: 13px;
+  bottom: 2px;
+  left: 10px;
+}
+
+/* Set chart styles */
+#chart {
+  max-width: 360px;
+  margin: 0px auto;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+}
+
+.map-overlay {
+  position: absolute;
+  width: 25%;
+  top: 0px;
+  right: 0%;
+  padding: 10px;
+  z-index: 700;
+}
+
+.map-overlay .map-overlay-inner {
+  background-color: rgba(255, 255, 255, 1.0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding-bottom: 60%;
+}
+
+/* the layer control */
+.leaflet-control-layers {
+  position: absolute;
+  width: 91px;
+  left: 50px;
+  top: 60px
+}
+```
+
+Now, if you save your code and refresh your map in live server, you will see the finished product!
+
+![The Finished Map](images/finished-map.png)
+**Figure 29**. The finished map.
