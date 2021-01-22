@@ -1358,7 +1358,7 @@ In this final lesson, you will learn how to add a graph that provides an analyti
 
 ### Wrangling the Data for the Graph
 
-First, we are going to need the help of the [Simple Statistics JavaScript library](https://simplestatistics.org/). If you navigate to the page linked above, you will notice that there is a CDN option (https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js) that we can link to in our page. Link to this in your html code just beneath where you linked to the Leaflet and jQuery libraries.
+First, we are going to need the help of the [Simple Statistics JavaScript library](https://simplestatistics.org/). If you navigate to the page linked above, you will notice that there is a CDN (Content Delivery Network) option (https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js) that we can link to in our page. Note that you saw a screenshot in the first lesson of a "js" folder in the project folder structure with a file called "simple-statistics.min.js". You can copy the library at the CDN link above, save it in a file in your project folder, and provide the path to this file in your html, if you are worried about the stability of linking directly to a web resource. However, for the sake of simplicity, we are just going to use the CDN link above in our index.html file. Link to this in your html code just beneath where you linked to the Leaflet and jQuery libraries.
 
 ```html
 <!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
@@ -1672,3 +1672,5 @@ Now, if you save your code and refresh your map in live server, you will see the
 
 ![The Finished Map](images/finished-map.png)
 **Figure 29**. The finished map.
+
+Obviously, there are a few things you could do to improve upon this and add some personal touches. For example, you might want to change the color of the area chart from blue to orange to match the wildfire layer style. You might also want to look into how you can change the fonts in the header, layer control, chart, or tooltip. You might even consider some more things you could do with this data, like measuring the amount of urban acres impacted by wildfires each year to explore risk to development. But, for the purposes of this lesson, we will move on to how to publish your map through a GitHub repository.
