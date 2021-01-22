@@ -1522,6 +1522,7 @@ $.when(
 Now, save your code edits, open web console, and refresh your map. You should see the following array logged to the web console, wherein each value corresponds to each year in the years array. These are the total acres burned for each year.
 
 ![Acres Burned Array](images/acres-burned-log.png)
+
 **Figure 28**. Acres burned array.
 
 Nice!
