@@ -29,6 +29,9 @@ Online tutorials for Leaflet Web Mapping
 - [Lesson 5: Add an Analytical Line Graph and Publish Map With GitHub](#lesson-5-add-an-analytical-line-graph-and-publish-map-with-github)
   - [Wrangling the Data for the Graph](#wrangling-the-data-for-the-graph)
   - [Building the Graph](#building-the-graph)
+  - [Setting Up a GitHub Account and Creating a Repository for Your Project](#setting-up-a-github-account-and-creating-a-repository-for-your-project)
+  - [Publishing Your Map](#publishing-your-map)
+  - [Lesson 5 Recap](#lesson-5-recap)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -1673,6 +1676,444 @@ Now, if you save your code and refresh your map in live server, you will see the
 ![The Finished Map](images/finished-map.png)
 **Figure 29**. The finished map.
 
+If anything went wrong, here is the final index.html code:
+
+```html
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <!-- Give the page a title -->
+  <title>California Wildfires</title>
+  <!-- Add a link to the Leaflet CSS library so you can reference it for styling your map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+  <!-- All the CSS code goes inside the style tags below -->
+  <style>
+    /* style the body */
+    body {
+      margin: 0px;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* style header */
+    header {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 447px;
+      height: 50px;
+      background-color: rgba(255, 255, 255, 1.0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+      z-index: 800;
+    }
+
+    /* the text inputs */
+    h1 {
+      color: black;
+      font-size: 18px;
+      display: inline-block;
+      margin-top: 0.25em;
+      margin-bottom: 0.0em;
+      margin-left: 0.5em;
+      margin-right: 0;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      font-size: 12px;
+      color: black;
+      display: inline-block;
+      margin-top: 0.0em;
+      margin-bottom: 0.0em;
+      margin-left: 0.75em;
+      margin-right: 0;
+      font-weight: normal;
+    }
+
+    /* style the map */
+    #map {
+      position: absolute;
+      width: 100%;
+      top: 0px;
+      bottom: 0;
+    }
+
+    /* Set time slider styles */
+    #slider {
+      position: absolute;
+      height: 25px;
+      bottom: 10px;
+      left: 125px;
+      z-index: 1000;
+      background-color: #FFFFFF;
+      border-radius: 3px;
+      box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Set temporal legend styles */
+    #temporal {
+      height: 25px;
+      width: 86px;
+      background-color: #FFFFFF;
+      border-radius: 3px;
+      box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Set the styles for the text span in the temporal legend */
+    #temporal span {
+      font-family: 'Montserrat', sans-serif;
+      position: absolute;
+      font-size: 13px;
+      bottom: 2px;
+      left: 10px;
+    }
+
+    /* Set chart styles */
+    #chart {
+      max-width: 360px;
+      margin: 0px auto;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
+
+    .map-overlay {
+      position: absolute;
+      width: 25%;
+      top: 0px;
+      right: 0%;
+      padding: 10px;
+      z-index: 700;
+    }
+
+    .map-overlay .map-overlay-inner {
+      background-color: rgba(255, 255, 255, 1.0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+      padding-bottom: 60%;
+    }
+
+    /* the layer control */
+    .leaflet-control-layers {
+      position: absolute;
+      width: 91px;
+      left: 50px;
+      top: 60px
+    }
+
+    /* the zoom control */
+    .leaflet-top {
+      bottom: 0;
+    }
+
+    .leaflet-top .leaflet-control-zoom {
+      top: 60px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- header -->
+  <header>
+    <h1>California Wildfires and Cities, 2010 - 2019</h1><br>
+    <h2>Map by Jay Bowen; Data courtesy of <a href="https://hub.arcgis.com/datasets/653647b20bc74480b335e31d6d81a52f/data?geometry=-151.022%2C31.426%2C-87.741%2C43.578&layer=1" style="color:blue;">ArcGIS Hub</a> and <a
+        href="https://geodata.lib.berkeley.edu/catalog/stanford-jt346pj7452" style="color:blue;">Berkeley Library Geodata</a></h2>
+  </header>
+  <!-- the map -->
+  <div id="map"></div>
+  <!-- ui slider -->
+  <div id="slider" class="leaflet-control">
+    <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+    <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+  </div>
+  <!-- temporal legend -->
+  <div id='temporal'>
+    <h5 class='txt-bold'><span></span></h5>
+  </div>
+  <!-- the area chart -->
+  <div class="map-overlay container">
+    <div class="map-overlay-inner">
+      <div id="chart"></div>
+    </div>
+  </div>
+  <!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+  <!-- Add a link to the jQuery JavaScript library so you can leverage ajax methods to load your data -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- for statistics, classifications -->
+  <script src="https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js"></script>
+  <!-- apex charts -->
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <!-- All JavaScript goes inside the script tags below -->
+  <script>
+    // define map options
+    const mapOptions = {
+      zoomSnap: 0.5, // this allows fractional zooming
+      center: [37.5, -120], // center the map on the coordinates for California
+      zoom: 6.5, // set the initial zoom
+    };
+
+    // define the map with the options above
+    const map = L.map("map", mapOptions);
+
+    // the following two arrays store the values that will be fed to the graph
+    // define an array to store all the years in the data
+    const years = [
+      "2010",
+      "2011",
+      "2012",
+      "2013",
+      "2014",
+      "2015",
+      "2016",
+      "2017",
+      "2018",
+      "2019"
+    ];
+
+    // define an empty array to store total areas burned by year
+    const areasBurned = [];
+
+    // add a base map to the map
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20
+    }).addTo(map);
+
+    // Add a scale bar
+    L.control.scale({
+      position: 'bottomright' // Position the scale bar at the bottom-right corner
+    }).addTo(map);
+
+    // use jquery to load wildfires GeoJSON data
+    $.when(
+      $.getJSON("data/California_Fire_Perimeters.json"),
+      $.getJSON("data/California_Urban.json"),
+      // when the files are done loading,
+      // identify them with names and process them through a function
+    ).done(function(caliFires, caliCities) {
+      // call the years array and for each year in sequence...
+      years.forEach(function iterate(item) {
+        // push rounded sums to the areasBurned array
+        areasBurned.push(parseInt(ss.sum(caliFires[0].features.map(function(feature) {
+          // if the feature's year is equal to the sequential year in the array
+          if (feature.properties['YEAR_'] == item) {
+            // return the acres burned
+            return feature.properties['GIS_ACRES'];
+            // otherwise return zero
+          } else return 0;
+        }))));
+      });
+      // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+      const wildfires = L.geoJson(caliFires, {
+        // style the layer
+        style: function(feature) {
+          return {
+            fillColor: "orange", // set the polygon fill to orange
+            fillOpacity: 0.3, // give the polygon fill a 30% opacity
+            color: "orange", // set the outline color to orange
+            weight: 1.2, // give the outline a weight
+            opacity: 0.7 // give the outline 70% opacity
+          };
+        },
+        // for each feature...
+        onEachFeature: function(feature, layer) {
+          // define the tooltip info
+          let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
+          // bind the tooltip to the layer and add the content defined as "wildfireTooltip" above
+          layer.bindTooltip(wildfireTooltip, {
+            sticky: true,
+            className: "tooltip",
+          });
+        }
+      }).addTo(map);
+      // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+      const urban = L.geoJson(caliCities, {
+        // style the layer
+        style: function(feature) {
+          return {
+            fillColor: "yellow", // set the polygon fill to yellow
+            fillOpacity: 0.3, // give the polygon fill a 30% opacity
+            color: "yellow", // set the outline color to yellow
+            weight: 1.0, // give the outline a weight
+            opacity: 0.7 // give the outline 70% opacity
+          };
+        },
+        // for each feature...
+        onEachFeature: function(feature, layer) {
+          // define the tooltip info
+          let cityTooltip = layer.feature.properties.name10;
+          // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+          layer.bindTooltip(cityTooltip, {
+            sticky: true,
+            className: "tooltip",
+          });
+          //define what happens on mouseover
+          layer.on("mouseover", function(e) {
+            layer.setStyle({
+              fillOpacity: 0.7,
+              opacity: 1.0
+            });
+          });
+          //define what happens on mouseout
+          layer.on("mouseout", function(e) {
+            layer.setStyle({
+              fillOpacity: 0.3,
+              opacity: 0.7
+            });
+          });
+        }
+      }).addTo(map);
+
+      // define layers for layer control
+      const controlLayers = {
+        "Urban Areas": urban,
+      };
+
+      // send the layers to the layer control
+      L.control.layers(null, controlLayers, {
+        collapsed: false,
+        position: 'topleft',
+      }).addTo(map);
+
+      // define the value in the slider when the map loads
+      let currentYear = $('.slider').val();
+
+      // call functions defined below
+      sequenceUI(wildfires); // calls the time slider and sends the layer to it
+      createTemporalLegend(currentYear); // calls the createTemporalLegend function
+      updateFires(wildfires, currentYear); // updates the layer according to the slider year upon loading
+      renderChart(); // creates the total acres burned chart
+    });
+
+    // call the UI slider with a function called "sequenceUI"
+    function sequenceUI(wildfires) { // feed it the wildfires data
+
+      // use the jQuery ajax method to get the slider element
+      $('.slider')
+        .on('input change', function() { // when the input changes...
+          let currentYear = $(this).val(); // identify the year selected with "currentYear"
+          createTemporalLegend(currentYear); // call the createTemporalLegend function
+          updateFires(wildfires, currentYear); // updates the layer according to the year selected by the slider
+        });
+
+    }; // End sequenceUI function
+
+    // Add a temporal legend in sync with the UI slider
+    function createTemporalLegend(currentYear) { // feed it the selected year
+
+      // define the temporal legend with a Leaflet control
+      const temporalLegend = L.control({
+        position: 'bottomleft' // place the temporal legend at bottom left corner
+      });
+
+      // when added to the map
+      temporalLegend.onAdd = function(map) {
+
+        const div = L.DomUtil.get("temporal"); // get the div
+
+        // disable the mouse events
+        L.DomEvent.addListener(div, 'mousedown', function(e) {
+          L.DomEvent.stopPropagation(e);
+        });
+
+        return div; // return the div from the function
+
+      }
+
+      $('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
+
+      temporalLegend.addTo(map); // add the temporal legend to the map
+
+    }; // End createTemporalLegend function
+
+    // Define updateFires function and feed it the wildfire data and the user-selected year
+    function updateFires(wildfires, currentYear) {
+      // access each layer in the wildfire data
+      wildfires.eachLayer(function(layer) {
+        // define the wildfire year
+        let year = layer.feature.properties.YEAR_;
+        // define the tooltip info
+        let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
+        // use conditional logic to test if the layer properties match the time slider year
+        if (year == currentYear) {
+          // if there is a match, add the wildfires layer to the map
+          layer.addTo(map);
+          // bind the tooltip to the layer and add the content defined as "wildfireTooltip" above
+          layer.bindTooltip(wildfireTooltip, {
+            sticky: true,
+            className: "tooltip",
+          });
+          // change the layer style on mouseover
+          layer.on("mouseover", function(e) {
+            this.setStyle({
+              fillOpacity: 0.7,
+              opacity: 1.0
+            });
+          });
+          // use existing option to reset the styles on mouseout
+          layer.on("mouseout", function(e) {
+            this.setStyle({
+              fillOpacity: 0.3,
+              opacity: 0.7
+            });
+          });
+        } else {
+          // otherwise, remove the layer from the map
+          map.removeLayer(layer);
+        };
+      });
+    }; // End updateFires function
+
+    // Define the renderChart function
+    function renderChart() {
+
+      // define the chart options
+      const options = {
+        chart: {
+          type: 'area',
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        title: {
+          text: 'Total Acres Burned',
+          align: 'left'
+        },
+        series: [{
+          name: 'acres burned',
+          // use the areasBurned array for the data
+          data: areasBurned
+        }],
+        xaxis: {
+          // use the sorted array years as the categories
+          categories: years
+        }
+      }
+      // define the chart
+      const chart = new ApexCharts(document.querySelector("#chart"), options);
+      // draw it on the page
+      chart.render();
+
+    }; // End renderChart function
+  </script>
+</body>
+
+</html>
+```
+
 Obviously, there are a few things you could do to improve upon this and add some personal touches. For example, you might want to change the color of the area chart from blue to orange to match the wildfire layer style. You might also want to look into how you can change the fonts in the header, layer control, chart, or tooltip. You might even consider some more things you could do with this data, like measuring the amount of urban acres impacted by wildfires each year to explore risk to development. But, for the purposes of this lesson, we will move on to how to publish your map through a GitHub repository.
 
 ### Setting Up a GitHub Account and Creating a Repository for Your Project
@@ -1681,3 +2122,41 @@ Obviously, there are a few things you could do to improve upon this and add some
 
 ![Adding a New GitHub Repository](images/add-new-repo.png)
 **Figure 30**. Adding a new GitHub repository.
+
+Once you have chosen to add a new repository, set up the repository as shown in the image below and click "Create repository".
+
+![Setting Up a New GitHub Repository](images/new-repo-options.png)
+**Figure 31**. Setting up a new GitHub repository.
+
+In the page that follows, click on the dropdown button that says "Add file" and choose "Upload files" as shown below.
+
+![Uploading Files to Your GitHub Repository](images/upload-files.png)
+**Figure 32**. Uploading files to your GitHub repository.
+
+Now, open your project folder on your desktop and drag and drop the content inside of it into the box on GitHub that says "Drag files here to add them to your repository". When the files finish uploading, click "Commit changes".
+
+![Commit an Upload to Your GitHub Repository](images/commit-upload.png)
+**Figure 33**. Commit an upload to your GitHub repository.
+
+Once you have committed your changes, you will be taken to the main page of your new GitHub repository. Now you can publish your map on the web.
+
+### Publishing Your Map
+
+You can use GitHub to publish your map on the web. On the main page of your new GitHub repository for the California wildfires map, locate the "Settings" option and click.
+
+![Locating the Repository Settings](images/github-settings.png)
+**Figure 34**. Locating the repository settings.
+
+Now, scroll down to "GitHub Pages" and change the source to "main" and click "Save". If your repository is not yet public, you may need to click "Change repository visibility" in the red box entitled "Danger Zone" and select "Make public".
+
+![Publishing to GitHub Pages](images/github-publish.png)
+**Figure 35**. Publishing to GitHub Pages.
+
+After you save these settings, scroll back to "GitHub Pages" on your Settings page. You should now notice a usable link after a statement that reads, "Your site is ready to be published at...". It may take a few minutes for it to work, but try clicking on that link and see if your map appears. You can now share this link or use it to embed the map into other sites.
+
+![A Link to Your Published Map](images/site-published.png)
+**Figure 36**. A link to your published map.
+
+### Lesson 5 Recap
+
+In this lesson, you learned how to access and format the wildfire data for an interactive area chart. Then, you learned how to build this chart using JavaScript, HTML, and CSS. Next, you learned how to open a GitHub account and use it to create a repository for your map project. Finally, you learned how to use GitHub to publish your map to the web. This concludes the intro to web mapping course. I hope you learned a lot and that you now have something you can reference if you choose to continue building web maps in the future!
