@@ -2126,6 +2126,7 @@ Obviously, there are a few things you could do to improve upon this and add some
 Once you have chosen to add a new repository, set up the repository as shown in the image below and click "Create repository".
 
 ![Setting Up a New GitHub Repository](images/new-repo-options.png)
+
 **Figure 31**. Setting up a new GitHub repository.
 
 In the page that follows, click on the dropdown button that says "Add file" and choose "Upload files" as shown below.
@@ -2150,11 +2151,13 @@ You can use GitHub to publish your map on the web. On the main page of your new 
 Now, scroll down to "GitHub Pages" and change the source to "main" and click "Save". If your repository is not yet public, you may need to click "Change repository visibility" in the red box entitled "Danger Zone" and select "Make public".
 
 ![Publishing to GitHub Pages](images/github-publish.png)
+
 **Figure 35**. Publishing to GitHub Pages.
 
 After you save these settings, scroll back to "GitHub Pages" on your Settings page. You should now notice a usable link after a statement that reads, "Your site is ready to be published at...". It may take a few minutes for it to work, but try clicking on that link and see if your map appears. You can now share this link or use it to embed the map into other sites.
 
 ![A Link to Your Published Map](images/site-published.png)
+
 **Figure 36**. A link to your published map.
 
 ### Lesson 5 Recap
