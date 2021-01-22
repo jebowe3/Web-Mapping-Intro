@@ -25,6 +25,8 @@ Online tutorials for Leaflet Web Mapping
   - [Editing the Function to Make the Time Slider Update the Wildfire Data](#editing-the-function-to-make-the-time-slider-update-the-wildfire-data)
   - [Finalizing the City Layer](#finalizing-the-city-layer)
   - [Adding a Title and Scale Bar (and a More In-Depth Look at CSS)](#adding-a-title-and-scale-bar-and-a-more-in-depth-look-at-css)
+  - [Lesson 4 Recap](#lesson-4-recap)
+- [Lesson 5: Add an Analytical Line Graph and Publish Map With GitHub](#lesson-5-add-an-analytical-line-graph-and-publish-map-with-github)
 
 ## Lesson 1: Finding and Wrangling Data, Basic Web Map Code Structure, Open Source Base Maps
 In this class, we will explore the [Leaflet JavaScript](https://leafletjs.com/) library for making interactive online maps. While it will help, there is no expectation that you be familiar with JavaScript or be able to write JavaScript from memory as a consequence of this class. This class is meant to familiarize yourself with learning how to use various web-based resources (including the tutorials presented here) to modify and apply Leaflet JavaScript to deploy an online map that you can host from GitHub and share with others.
@@ -1341,3 +1343,185 @@ Now, if you save your edits and refresh the map, you should see something like t
 ![Corrected Header](images/corrected-header.png)
 
 **Figure 27**. Corrected header.
+
+This map is almost good to go. In the next lesson, you will learn how to add a graph that provides an analytical overview of the acreage burned by year. You will also learn how to publish your map using a GitHub repository. But, first, let's review what you learned in this lesson.
+
+### Lesson 4 Recap
+
+In this lesson, we learned how to write a function to filter our data with the time slider. We also learned how to add a subtle style change when mousing over the cities. Next, we learned how to add a title and a scale bar. Finally, we took a deeper look at how to use css to style and rearrange map elements.
+
+## Lesson 5: Add an Analytical Line Graph and Publish Map With GitHub
+
+In this final lesson, you will learn how to add a graph that provides an analytical overview of the acreage burned by year as well as how to publish your map through a GitHub repository.
+
+### Wrangling the Data for the Graph
+
+First, we are going to need the help of the [Simple Statistics JavaScript library](https://simplestatistics.org/). If you navigate to the page linked above, you will notice that there is a CDN option (https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js) that we can link to in our page. Link to this in your html code just beneath where you linked to the Leaflet and jQuery libraries.
+
+```html
+<!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+<!-- Add a link to the jQuery JavaScript library so you can leverage ajax methods to load your data -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- for statistics, classifications -->
+<script src="https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js"></script>
+```
+
+Now that you have linked to this library, you can use its methods to perform statistical functions. Before we do that, we need to add some scaffolding just after the `const map = L.map("map", mapOptions);` code that defines our map. Edit your JavaScript as follows:
+
+```js
+// define the map with the options above
+const map = L.map("map", mapOptions);
+
+// the following two arrays store the values that will be fed to the graph
+// define an array to store all the years in the data
+const years = [
+  "2010",
+  "2011",
+  "2012",
+  "2013",
+  "2014",
+  "2015",
+  "2016",
+  "2017",
+  "2018",
+  "2019"
+];
+
+// define an empty array to store total areas burned by year
+const areasBurned = [];
+```
+
+Here, you have added two arrays. One contains all of the years in the data, and these will be fed to the x-axis of our graph. The next array is left empty, so that you can fill it after using the simple statistics library to total the acres burned in each year. These values will be fed to the y-axis of our graph. Now, we need to sum the acres burned by wildfires each year and push these values in sequential order to the empty areasBurned array.
+
+Just before where you initiate the Leaflet GeoJSON wildfire layer, you need to add a function that iterates through both the years array and the wildfire layer's feature properties, looking for matches between each year and each feature's 'YEAR_' value. When it finds a match, this function will sum all the 'GIS_ACRES' values for matching features and push them to the areasBurned array. Add the following code just above `const wildfires = L.geoJson(caliFires, {})`:
+
+```js
+// call the years array and for each year in sequence...
+years.forEach(function iterate(item) {
+  // push rounded sums to the areasBurned array
+  areasBurned.push(parseInt(ss.sum(caliFires[0].features.map(function(feature) {
+    // if the feature's year is equal to the sequential year in the array
+    if (feature.properties['YEAR_'] == item) {
+      // return the acres burned
+      return feature.properties['GIS_ACRES'];
+      // otherwise return zero
+    } else return 0;
+  }))));
+});
+```
+
+What is this code doing? First, the `years.forEach(function iterate(item) {});` envelope takes the years array you defined above and iterates through each item, here simply given the identifier "item". Inside this envelope is another envelope: `areasBurned.push(parseInt(ss.sum(caliFires[0].features.map(function(feature) {}))));`. This is saying that, for whatever is returned by the function we will run on the California wildfire layer's features, sum the returned values with the Simple Statistics library (ss.sum), parse the result as an interval (no decimal places), and push the value to the areasBurned array. So, what is this function returning? If you look inside the function we are running on the wildfire features, notice that we have added a conditional test: `if (feature.properties['YEAR_'] == item) {return feature.properties['GIS_ACRES'];} else return 0;`. This is telling our app that, if the wildfire feature property named 'YEAR_' is equivalent to the item (or year) in the years array, return the number held by the wildfire feature property named 'GIS_ACRES'. Otherwise, return a value of 0. The structure is a little like a snail shell, and it is a bit confusing at first, but with some more exposure to this kind of scripting, it will begin to make sense.
+
+Let's confirm that this did what we want by adding a `console.log(areasBurned);` command just after where you add the cities layer in your JavaScript. This entire function should now look like this:
+
+```js
+// use jquery to load wildfires GeoJSON data
+$.when(
+  $.getJSON("data/California_Fire_Perimeters.json"),
+  $.getJSON("data/California_Urban.json"),
+// when the files are done loading,
+// identify them with names and process them through a function
+).done(function(caliFires, caliCities) {
+  // call the years array and for each year in sequence...
+  years.forEach(function iterate(item) {
+    // push rounded sums to the areasBurned array
+    areasBurned.push(parseInt(ss.sum(caliFires[0].features.map(function(feature) {
+      // if the feature's year is equal to the sequential year in the array
+      if (feature.properties['YEAR_'] == item) {
+        // return the acres burned
+        return feature.properties['GIS_ACRES'];
+        // otherwise return zero
+      } else return 0;
+    }))));
+  });
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the wildfires data, and add to the map
+  const wildfires = L.geoJson(caliFires, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "orange", // set the polygon fill to orange
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "orange", // set the outline color to orange
+        weight: 1.2, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // define the tooltip info
+      let wildfireTooltip = layer.feature.properties.FIRE_NAME + " FIRE, " + layer.feature.properties.ALARM_DATE.substring(0, 10) + "<br>" + parseInt(layer.feature.properties.GIS_ACRES) + " acres burned";
+      // bind the tooltip to the layer and add the content defined as "wildfireTooltip" above
+      layer.bindTooltip(wildfireTooltip, {
+        sticky: true,
+        className: "tooltip",
+      });
+    }
+  }).addTo(map);
+  // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
+  const urban = L.geoJson(caliCities, {
+    // style the layer
+    style: function(feature) {
+      return {
+        fillColor: "yellow", // set the polygon fill to yellow
+        fillOpacity: 0.3, // give the polygon fill a 30% opacity
+        color: "yellow", // set the outline color to yellow
+        weight: 1.0, // give the outline a weight
+        opacity: 0.7 // give the outline 70% opacity
+      };
+    },
+    // for each feature...
+    onEachFeature: function(feature, layer) {
+      // define the tooltip info
+      let cityTooltip = layer.feature.properties.name10;
+      // bind the tooltip to the layer and add the content defined as "cityTooltip" above
+      layer.bindTooltip(cityTooltip, {
+        sticky: true,
+        className: "tooltip",
+      });
+      //define what happens on mouseover
+      layer.on("mouseover", function(e) {
+        layer.setStyle({
+          fillOpacity: 0.7,
+          opacity: 1.0
+        });
+      });
+      //define what happens on mouseout
+      layer.on("mouseout", function(e) {
+        layer.setStyle({
+          fillOpacity: 0.3,
+          opacity: 0.7
+        });
+      });
+    }
+  }).addTo(map);
+
+  console.log(areasBurned);
+
+  // define layers for layer control
+  const controlLayers = {
+    "Urban Areas": urban,
+  };
+
+  // send the layers to the layer control
+  L.control.layers(null, controlLayers, {
+    collapsed: false,
+    position: 'topleft',
+  }).addTo(map);
+
+  // define the value in the slider when the map loads
+  let currentYear = $('.slider').val();
+
+  // call functions defined below
+  sequenceUI(wildfires); // calls the time slider and sends the layer to it
+  createTemporalLegend(currentYear); // calls the createTemporalLegend function
+  updateFires(wildfires, currentYear); // updates the layer according to the slider year upon loading
+});
+```
+
+Now, save your code edits, open web console, and refresh your map. You should see the following array logged to the web console, wherein each value corresponds to each year in the years array. These are the total acres burned for each year.
+
+![Acres Burned Array](images/acres-burned-log.png)
+**Figure 28**. Acres burned array.
+
+Nice!
