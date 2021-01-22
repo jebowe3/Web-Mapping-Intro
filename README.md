@@ -1358,7 +1358,7 @@ In this final lesson, you will learn how to add a graph that provides an analyti
 
 ### Wrangling the Data for the Graph
 
-First, we are going to need the help of the [Simple Statistics JavaScript library](https://simplestatistics.org/). If you navigate to the page linked above, you will notice that there is a CDN (Content Delivery Network) option (https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js) that we can link to in our page. Note that you saw a screenshot in the first lesson of a "js" folder in the project folder structure with a file called "simple-statistics.min.js". You can copy the library at the CDN link above, save it in a file in your project folder, and provide the path to this file in your html, if you are worried about the stability of linking directly to a web resource. However, for the sake of simplicity, we are just going to use the CDN link above in our index.html file. Link to this in your html code just beneath where you linked to the Leaflet and jQuery libraries.
+First, we are going to need the help of the [Simple Statistics JavaScript library](https://simplestatistics.org/). If you navigate to the page linked above, you will notice that there is a CDN (Content Delivery Network) option (https://unpkg.com/simple-statistics@7.4.0/dist/simple-statistics.min.js) that we can link to in our page. Note that you saw a screenshot in the first lesson of a "js" folder in the project folder structure with a file called "simple-statistics.min.js". You can copy the library at the CDN link above, save it in a file in your project folder, and provide the path to this file in your html, if you are worried about the stability of linking directly to a web resource. However, for the sake of simplicity, we are just going to use the CDN link above in our index.html file. Since we are doing this, you can actually delete the empty "js" folder inside your project folder. Link to this in your html code just beneath where you linked to the Leaflet and jQuery libraries.
 
 ```html
 <!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
@@ -1588,7 +1588,7 @@ function renderChart() {
 }; // End renderChart function
 ```
 
-To understand more about this code, you can review the documentation for area charts at the [ApexCharts site](https://apexcharts.com/javascript-chart-demos/area-charts/basic/). You will find that, when you use a new libary, you may need to dig into some pretty substantial documentation to find exactly what you want.
+To understand more about this code, you can review the documentation for area charts at the [ApexCharts site](https://apexcharts.com/javascript-chart-demos/area-charts/basic/). You will find that, when you use a new library, you may need to dig into some pretty substantial documentation to find exactly what you want.
 
 At this point, we have inserted the code that renders our graph/chart, but we need to call this function within the first function that handles our JSON data. Add a call for `renderChart` here:
 
@@ -1674,3 +1674,10 @@ Now, if you save your code and refresh your map in live server, you will see the
 **Figure 29**. The finished map.
 
 Obviously, there are a few things you could do to improve upon this and add some personal touches. For example, you might want to change the color of the area chart from blue to orange to match the wildfire layer style. You might also want to look into how you can change the fonts in the header, layer control, chart, or tooltip. You might even consider some more things you could do with this data, like measuring the amount of urban acres impacted by wildfires each year to explore risk to development. But, for the purposes of this lesson, we will move on to how to publish your map through a GitHub repository.
+
+### Setting Up a GitHub Account and Creating a Repository for Your Project
+
+[GitHub](https://github.com/) allows you to host and publish your projects on the web. It also allows you to follow other developers and to collaborate with them on projects. To create a free account, follow these [wikiHow instructions](https://www.wikihow.com/Create-an-Account-on-GitHub). Once you have a personal GitHub account, sign in and navigate to the top right corner of the page, where you will see a + sign. Clicking the dropdown next to it reveals an option to create a new repository. Click on "New repository".
+
+![Adding a New GitHub Repository](images/add-new-repo.png)
+**Figure 30**. Adding a new GitHub repository.
