@@ -1639,16 +1639,18 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
 
 /* Set chart styles */
 #chart {
-  max-width: 360px;
+  max-width: 100%;
+  max-height: 100%;
   margin: 0px auto;
   position: absolute;
-  top: 10px;
-  right: 15px;
+  top: 0px;
+  right: 0px;
 }
 
 .map-overlay {
   position: absolute;
   width: 25%;
+  height: 30%;
   top: 0px;
   right: 0%;
   padding: 10px;
@@ -1659,7 +1661,7 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
   background-color: rgba(255, 255, 255, 1.0);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   border-radius: 3px;
-  padding-bottom: 60%;
+  height: 100%;
 }
 
 /* the layer control */
@@ -1775,16 +1777,18 @@ If anything went wrong, here is the final index.html code:
 
     /* Set chart styles */
     #chart {
-      max-width: 360px;
+      max-width: 100%;
+      max-height: 100%;
       margin: 0px auto;
       position: absolute;
-      top: 10px;
-      right: 15px;
+      top: 0px;
+      right: 0px;
     }
 
     .map-overlay {
       position: absolute;
       width: 25%;
+      height: 30%;
       top: 0px;
       right: 0%;
       padding: 10px;
@@ -1795,7 +1799,7 @@ If anything went wrong, here is the final index.html code:
       background-color: rgba(255, 255, 255, 1.0);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       border-radius: 3px;
-      padding-bottom: 60%;
+      height: 100%;
     }
 
     /* the layer control */
