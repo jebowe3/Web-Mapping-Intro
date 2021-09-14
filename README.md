@@ -1328,7 +1328,7 @@ That looks better, but the header is crashing into the zoom control. We need som
 /* the layer control */
 .leaflet-control-layers {
   position: absolute;
-  width: 91px;
+  width: 92px;
   left: 50px;
   top: 60px
 }
@@ -1667,7 +1667,7 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
 /* the layer control */
 .leaflet-control-layers {
   position: absolute;
-  width: 91px;
+  width: 92px;
   left: 50px;
   top: 60px
 }
@@ -1805,7 +1805,7 @@ If anything went wrong, here is the final index.html code:
     /* the layer control */
     .leaflet-control-layers {
       position: absolute;
-      width: 91px;
+      width: 92px;
       left: 50px;
       top: 60px
     }
