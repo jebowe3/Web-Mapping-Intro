@@ -58,9 +58,9 @@ Before downloading any data, set up your project folder as follows. Make a new f
 ![Initial Folder Structure](images/initial-folder-structure.png)  
 **Figure 02**. Initial folder structure.
 
-At [ArcGIS Hub](https://hub.arcgis.com/datasets/653647b20bc74480b335e31d6d81a52f/data?geometry=-151.022%2C31.426%2C-87.741%2C43.578&layer=1&orderBy=YEAR_&orderByAsc=false), you can find polygons delimiting all burned areas in California for the 2010s. Go ahead and click the link above. Then select Download >> Shapefile under "Full Dataset" as shown below.
+At [ArcGIS Hub](https://hub.arcgis.com/datasets/CALFIRE-Forestry::california-fire-perimeters/explore?layer=2&location=37.342037%2C-119.381350%2C7.00), you can find polygons delimiting all burned areas in California for the 2010s. Go ahead and click the link above. Then select Download >> Shapefile (Download Options) >> Download file previously generated... as shown below. While the site now offers downloads in GeoJSON format, let's download the shapefile anyway to demonstrate how to convert shapefile data into JSON format.
 
-![Downloading California Wildfire Data](images/cal-fire-data.png)  
+![Downloading California Wildfire Data](images/cal-fire-download.PNG)  
 **Figure 03**. Downloading the California wildfire data.
 
 In your downloads folder, you will now see the shapefile containing the data. However, as described above, this is the wrong data format for JavaScript web mapping. We need this in JSON (JavaScript Object Notation) format. What to do?
