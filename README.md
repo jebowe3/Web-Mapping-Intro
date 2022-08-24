@@ -1643,7 +1643,7 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
   max-height: 100%;
   margin: 0px auto;
   position: absolute;
-  top: 0px;
+  top: 20px;
   right: 0px;
 }
 
@@ -1653,7 +1653,7 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
   height: 30%;
   top: 0px;
   right: 0%;
-  padding: 10px;
+  padding-top: 10px;
   z-index: 700;
 }
 
@@ -1781,7 +1781,7 @@ If anything went wrong, here is the final index.html code:
       max-height: 100%;
       margin: 0px auto;
       position: absolute;
-      top: 0px;
+      top: 20px;
       right: 0px;
     }
 
@@ -1791,7 +1791,7 @@ If anything went wrong, here is the final index.html code:
       height: 30%;
       top: 0px;
       right: 0%;
-      padding: 10px;
+      padding-top: 10px;
       z-index: 700;
     }
 
