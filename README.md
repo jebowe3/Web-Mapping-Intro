@@ -1641,6 +1641,8 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
   height: 10%;
   width: 25%;
   background-color:white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
   z-index: 1000
 }
 
@@ -1763,6 +1765,8 @@ If anything went wrong, here is the final index.html code:
       height: 10%;
       width: 25%;
       background-color:white;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
       z-index: 1000
     }
 
