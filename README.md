@@ -1234,7 +1234,7 @@ Now for the title bar. For this, we will need a new html header element. Just af
 <!-- header -->
 <header>
   <h1>California Wildfires and Cities, 2010 - 2019</h1><br>
-  <h2>Map by Jay Bowen; Data courtesy of <a href ="https://hub.arcgis.com/datasets/653647b20bc74480b335e31d6d81a52f/data?geometry=-151.022%2C31.426%2C-87.741%2C43.578&layer=1" style="color:blue;">ArcGIS Hub</a> and <a href ="https://geodata.lib.berkeley.edu/catalog/stanford-jt346pj7452" style="color:blue;">Berkeley Library Geodata</a></h2>
+  <h2>Map by Jay Bowen; Data courtesy of <a href ="https://hub.arcgis.com/datasets/CALFIRE-Forestry::california-fire-perimeters/explore?layer=2&location=37.342037%2C-119.381350%2C7.00" style="color:blue;">ArcGIS Hub</a> and <a href ="https://geodata.lib.berkeley.edu/catalog/stanford-jt346pj7452" style="color:blue;">Berkeley Library Geodata</a></h2>
 </header>
 <!-- the map -->
 <div id="map"></div>
@@ -1328,7 +1328,7 @@ That looks better, but the header is crashing into the zoom control. We need som
 /* the layer control */
 .leaflet-control-layers {
   position: absolute;
-  width: 92px;
+  width: 93px;
   left: 50px;
   top: 60px
 }
@@ -1603,7 +1603,7 @@ updateFires(wildfires, currentYear); // updates the layer according to the slide
 renderChart(); // creates the total acres burned chart
 ```
 
-If you save your code and refresh your map, you will see an error message (`Uncaught (in promise) Error: Element not found`) in the web console. This is because we still need write an html div to create the chart element. Towards the top of our index.html document, right beneath the html code that defines the temporal legend, let's add some new code to create the chart element with the id of "chart". Also take note of the defined div classes. These identifiers will become important in just a bit, when we style this element with some more css.
+If you save your code and refresh your map, you will see an error message (`Uncaught (in promise) Error: Element not found`) in the web console. This is because we still need write an html div to create the chart element. Towards the top of our index.html document, right beneath the html code that defines the temporal legend, let's add some new code to create the chart element with the id of "chart". This id will become important in just a bit, when we style this element with some more css.
 
 ```html
 <!-- the map -->
@@ -1618,14 +1618,10 @@ If you save your code and refresh your map, you will see an error message (`Unca
   <h5 class='txt-bold'><span></span></h5>
 </div>
 <!-- the area chart -->
-<div class="map-overlay container">
-  <div class="map-overlay-inner">
-    <div id="chart"></div>
-  </div>
-</div>
+<div id="chart"></div>
 ```
 
-Saving and refreshing your map will demonstrate some humorous results. The chart has been added, but it is way too large and improperly located. We need some css to rescue this debacle. Let's add some new css just after the code that styles the temporal legend and just before the code that repositions the layer control, as shown below (focus on `#chart`, `.map-overlay`, and `.map-overlay .map-overlay-inner`).
+Saving and refreshing your map will demonstrate some humorous results. The chart has been added, but it is way too large and improperly located. We need some css to rescue this debacle. Let's add some new css just after the code that styles the temporal legend and just before the code that repositions the layer control, as shown below (focus on `#chart`).
 
 ```css
 /* Set the styles for the text span in the temporal legend */
@@ -1639,35 +1635,19 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
 
 /* Set chart styles */
 #chart {
-  max-width: 100%;
-  max-height: 100%;
-  margin: 0px auto;
   position: absolute;
-  top: 20px;
-  right: 0px;
-}
-
-.map-overlay {
-  position: absolute;
+  top: 10px;
+  right: 10px;
+  height: 10%;
   width: 25%;
-  height: 30%;
-  top: 0px;
-  right: 0%;
-  padding-top: 10px;
-  z-index: 700;
-}
-
-.map-overlay .map-overlay-inner {
-  background-color: rgba(255, 255, 255, 1.0);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  height: 100%;
+  background-color:white;
+  z-index: 1000
 }
 
 /* the layer control */
 .leaflet-control-layers {
   position: absolute;
-  width: 92px;
+  width: 93px;
   left: 50px;
   top: 60px
 }
@@ -1777,35 +1757,19 @@ If anything went wrong, here is the final index.html code:
 
     /* Set chart styles */
     #chart {
-      max-width: 100%;
-      max-height: 100%;
-      margin: 0px auto;
       position: absolute;
-      top: 20px;
-      right: 0px;
-    }
-
-    .map-overlay {
-      position: absolute;
+      top: 10px;
+      right: 10px;
+      height: 10%;
       width: 25%;
-      height: 30%;
-      top: 0px;
-      right: 0%;
-      padding-top: 10px;
-      z-index: 700;
-    }
-
-    .map-overlay .map-overlay-inner {
-      background-color: rgba(255, 255, 255, 1.0);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      border-radius: 3px;
-      height: 100%;
+      background-color:white;
+      z-index: 1000
     }
 
     /* the layer control */
     .leaflet-control-layers {
       position: absolute;
-      width: 92px;
+      width: 93px;
       left: 50px;
       top: 60px
     }
@@ -1825,8 +1789,7 @@ If anything went wrong, here is the final index.html code:
   <!-- header -->
   <header>
     <h1>California Wildfires and Cities, 2010 - 2019</h1><br>
-    <h2>Map by Jay Bowen; Data courtesy of <a href="https://hub.arcgis.com/datasets/653647b20bc74480b335e31d6d81a52f/data?geometry=-151.022%2C31.426%2C-87.741%2C43.578&layer=1" style="color:blue;">ArcGIS Hub</a> and <a
-        href="https://geodata.lib.berkeley.edu/catalog/stanford-jt346pj7452" style="color:blue;">Berkeley Library Geodata</a></h2>
+    <h2>Map by Jay Bowen; Data courtesy of <a href ="https://hub.arcgis.com/datasets/CALFIRE-Forestry::california-fire-perimeters/explore?layer=2&location=37.342037%2C-119.381350%2C7.00" style="color:blue;">ArcGIS Hub</a> and <a href ="https://geodata.lib.berkeley.edu/catalog/stanford-jt346pj7452" style="color:blue;">Berkeley Library Geodata</a></h2>
   </header>
   <!-- the map -->
   <div id="map"></div>
@@ -1840,11 +1803,7 @@ If anything went wrong, here is the final index.html code:
     <h5 class='txt-bold'><span></span></h5>
   </div>
   <!-- the area chart -->
-  <div class="map-overlay container">
-    <div class="map-overlay-inner">
-      <div id="chart"></div>
-    </div>
-  </div>
+  <div id="chart"></div>
   <!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
   <!-- Add a link to the jQuery JavaScript library so you can leverage ajax methods to load your data -->
@@ -1857,7 +1816,7 @@ If anything went wrong, here is the final index.html code:
   <script>
     // define map options
     const mapOptions = {
-      zoomSnap: 0.5, // this allows fractional zooming
+      zoomSnap: 0.5,  // this allows fractional zooming
       center: [37.5, -120], // center the map on the coordinates for California
       zoom: 6.5, // set the initial zoom
     };
@@ -1899,8 +1858,8 @@ If anything went wrong, here is the final index.html code:
     $.when(
       $.getJSON("data/California_Fire_Perimeters.json"),
       $.getJSON("data/California_Urban.json"),
-      // when the files are done loading,
-      // identify them with names and process them through a function
+    // when the files are done loading,
+    // identify them with names and process them through a function
     ).done(function(caliFires, caliCities) {
       // call the years array and for each year in sequence...
       years.forEach(function iterate(item) {
