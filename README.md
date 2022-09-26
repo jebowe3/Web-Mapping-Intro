@@ -194,6 +194,8 @@ This gives the map a dark base map that minimizes the visual clutter so that we 
 ![Changing the Base Map](images/map-2.png)  
 **Figure 11**. Changing the base map.
 
+If you are using a browser other than Firefox, you may notice that there are lines over your map. These graticules appear in these browsers when using fractional zooming. You can switch to Firefox, or change your code so that your initial zoom is 6 or 7, instead of 6.5 and delete the zoomSnap line. After we add our data to the map, we can look at a way to set the initial zoom dynamically based on the size of your monitor and the bounds of the data added to the map.
+
 ### Lesson 1 Recap
 
 This concludes the first lesson. By the end of this lesson, you should be familiar with finding and downloading geospatial data, converting these data into JSON format and reducing the file size using Mapshaper, organizing your project folder for web mapping, using Atom text editor for setting up a basic index template with HTML, Leaflet CSS, and Leaflet JavaScript in order to produce an initial web map, checking edits with Atom Live Server, centering the map on a specific geographic area using coordinates and zoom settings, and implementing different base maps with Leaflet JavaScript. These first steps are giant steps, so you might want to return to the beginning and review everything one more time to help it settle!
@@ -531,6 +533,35 @@ After saving and refreshing, you should now see informative tooltip content when
 ![Interactive Tooltip Content](images/tooltip-content.png)  
 **Figure 21**. Interactive tooltip content.
 
+Last time, we observed the issue of graticules appearing with fractional zooming in non-Firefox browsers. To remove this across browsers, let's get rid of the fractional zoom and initial zoom settings. Change the following...
+
+```js
+// define map options
+const mapOptions = {
+  zoomSnap: 0.5,  // this allows fractional zooming
+  center: [37.5, -120], // center the map on the coordinates for California
+  zoom: 6.5, // set the initial zoom
+};
+```
+
+to...
+
+```js
+// define map options
+const mapOptions = {
+  center: [37.5, -120], // center the map on the coordinates for California
+};
+```
+
+Now, beneath where you added the last layer to your map, you need to add a line ```map.fitBounds(wildfires.getBounds());``` to fit the map to the bounds of the wildfire layer, as shown below.
+
+```js
+// fit the map to the bounds of the wildfires layer
+map.fitBounds(wildfires.getBounds());
+```
+
+At this point, your map should automatically zoom to fit this layer upon loading and the graticules should disappear.
+
 ### Lesson 2 Recap
 
 In this lesson, we learned how to load GeoJSON data with jQuery ajax methods to visualize it on a web map. We took a look at using the web console to develop and debug maps with Atom Live Server. We examined how to style a polygon inside a Leaflet GeoJSON layer and looked at hex codes for coloring. Finally, we introduced some basic user interaction by adding layer tooltip content and using console logs to query the GeoJSON file structure and to access its internal data.
@@ -541,15 +572,15 @@ When we added the tooltip content to our map, we noticed that each wildfire had 
 
 ### Adding a Time Slider
 
-First, let's add a time slider. This will require coding a new div into our page. Open the map project in Atom and open the index.html file. Within the <body> tags of your HTML code, you will insert a new div we will call "slider" just beneath the one called "map".
+First, let's add a time slider. This will require coding a new div into our page. Open the map project in Atom and open the index.html file. Within the <body> tags of your HTML code, you will insert a new div we will call "slider-control" just beneath the one called "map".
 
 ```html
-<!-- the map -->
-<div id="map"></div>
 <!-- ui slider -->
-<div id="slider" class="leaflet-control">
-  <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
-  <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+<div id="slider-control">
+  <div id="slider" class="leaflet-control">
+    <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+    <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+  </div>
 </div>
 ```
 
@@ -564,11 +595,21 @@ We give ids to these divs so that we can reference them in our CSS and JavaScrip
   bottom: 0;
 }
 
+/* style the slider-control div */
+#slider-control {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  width: 30%;
+  height: 25px;
+  z-index: 700;
+}
+
 /* Set time slider styles */
 #slider {
   position: absolute;
-  height: 25px;
-  bottom: 10px;
+  height: 100%;
+  bottom: 0px;
   left: 125px;
   z-index: 1000;
   background-color: #FFFFFF;
@@ -577,7 +618,7 @@ We give ids to these divs so that we can reference them in our CSS and JavaScrip
 }
 ```
 
-Notice that you referenced the slider element using its div id by typing "#slider", just as you did for the map in the CSS above it. Within the curly brackets, you fed the script some details about where the slider should be located and how it should appear. Feel free to fiddle around with these settings so that you can understand what these options do. You can also research other CSS options you can use by searching online. Now, if you save your code and refresh your map, you should see a fully styled slider in the bottom left corner of your map. We have not yet added a temporal legend, nor have we added any code to make this slider talk to our wildfire data. You can move the slider, but it doesn't do anything!
+Notice that you referenced the slider and slider-control elements using their div ids by typing "#slider" and "#slider-control", just as you did for the map in the CSS above it. Within the curly brackets, you fed the script some details about where the slider should be located and how it should appear. Feel free to fiddle around with these settings so that you can understand what these options do. You can also research other CSS options you can use by searching online. Now, if you save your code and refresh your map, you should see a fully styled slider in the bottom left corner of your map. We have not yet styled a temporal legend, nor have we added any code to make this slider talk to our wildfire data. You can move the slider, but it doesn't do anything!
 
 ### Retrieving the Time Slider Inputs with JavaScript
 
@@ -635,24 +676,26 @@ In order to add a temporal legend, the first thing we need to do is to add anoth
 <!-- the map -->
 <div id="map"></div>
 <!-- ui slider -->
-<div id="slider" class="leaflet-control">
-  <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
-  <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
-</div>
-<!-- temporal legend -->
-<div id='temporal'>
-  <h5 class='txt-bold'><span></span></h5>
+<div id="slider-control">
+  <div id="slider" class="leaflet-control">
+    <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+    <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+  </div>
+  <!-- temporal legend -->
+  <div id='temporal'>
+    <h5 class='txt-bold'><span></span></h5>
+  </div>
 </div>
 ```
 
-This will not result in any visible changes to your map, so don't worry if everything looks the same after saving and refreshing. Now, we need to add some CSS to style the temporal legend. Add this code just below the CSS for the time slider.
+Don't worry if the map doesn't look as you expect after saving and refreshing. We need to add some CSS to style the temporal legend. Add this code just below the CSS for the time slider.
 
 ```css
 /* Set time slider styles */
 #slider {
   position: absolute;
-  height: 25px;
-  bottom: 10px;
+  height: 100%;
+  bottom: 0px;
   left: 125px;
   z-index: 1000;
   background-color: #FFFFFF;
@@ -662,8 +705,11 @@ This will not result in any visible changes to your map, so don't worry if every
 
 /* Set temporal legend styles */
 #temporal {
-  height: 25px;
+  position: absolute;
+  height: 100%;
+  bottom: 0px;
   width: 86px;
+  z-index: 1000;
   background-color: #FFFFFF;
   border-radius: 3px;
   box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
@@ -674,14 +720,14 @@ This will not result in any visible changes to your map, so don't worry if every
   font-family: 'Montserrat', sans-serif;
   position: absolute;
   font-size: 13px;
-  bottom: 2px;
+  bottom: 4px;
   left: 10px;
 }
 ```
 
-Notice that we have added two blocks of CSS code. The first one is for the legend itself, while the second one pertains to the text within the legend, which will display the selected year. Again, after saving and refreshing, you will not notice any changes to your map. We need to define and add a new function to add the legend to the map and get it to interact with the time slider.
+Notice that we have added two blocks of CSS code. The first one is for the legend itself, while the second one pertains to the text within the legend, which will display the selected year. Now, we need to define and add a new function to get the temporal legend to interact with the time slider.
 
-Let's call this new function "createTemporalLegend" and define what it does right after the "sequenceUI" function. We want the temporal legend to display the year selected by the time slider, so we will feed this function the "currentYear" value. The function should be written as follows:
+Let's call this new function "createTemporalLegend" and define what it does right after the "sequenceUI" function. We want the temporal legend to display the year selected by the time slider, so we will feed this function the "currentYear" value. This simple function should be written as follows:
 
 ```js
 // call the UI slider with a function called "sequenceUI"
@@ -699,28 +745,7 @@ function sequenceUI(wildfires) { // feed it the wildfires data
 // Add a temporal legend in sync with the UI slider
 function createTemporalLegend(currentYear) { // feed it the selected year
 
-  // define the temporal legend with a Leaflet control
-  const temporalLegend = L.control({
-    position: 'bottomleft' // place the temporal legend at bottom left corner
-  });
-
-  // when added to the map
-  temporalLegend.onAdd = function(map) {
-
-    const div = L.DomUtil.get("temporal"); // get the div
-
-    // disable the mouse events
-    L.DomEvent.addListener(div, 'mousedown', function(e) {
-      L.DomEvent.stopPropagation(e);
-    });
-
-    return div; // return the div from the function
-
-  }
-
   $('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
-
-  temporalLegend.addTo(map); // add the temporal legend to the map
 
 }; // End createTemporalLegend function
 ```
@@ -741,7 +766,7 @@ function sequenceUI(wildfires) { // feed it the wildfires data
 }; // End sequenceUI function
 ```
 
-Now, upon saving and refreshing, you will notice that the temporal legend appears to the left of your time slider as soon as you use the time slider. It works, but we want the legend to appear when the map loads before we use the slider. For this, we also need to define the time slider year and call the "createTemporalLegend" function within the first function that loads and processes our JSON data.
+Now, upon saving and refreshing, you will notice that the text in the temporal legend appears to the left of your time slider as soon as you use the time slider. It works, but we want the legend to appear when the map loads before we use the slider. For this, we also need to define the time slider year and call the "createTemporalLegend" function within the first function that loads and processes our JSON data.
 
 ```js
 }).addTo(map);
@@ -784,11 +809,21 @@ At this point, the entirety of your code within your index.html file should mirr
       bottom: 0;
     }
 
+    /* style the slider-control div */
+    #slider-control {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      width: 30%;
+      height: 25px;
+      z-index: 700;
+    }
+
     /* Set time slider styles */
     #slider {
       position: absolute;
-      height: 25px;
-      bottom: 10px;
+      height: 100%;
+      bottom: 0px;
       left: 125px;
       z-index: 1000;
       background-color: #FFFFFF;
@@ -798,8 +833,11 @@ At this point, the entirety of your code within your index.html file should mirr
 
     /* Set temporal legend styles */
     #temporal {
-      height: 25px;
+      position: absolute;
+      height: 100%;
+      bottom: 0px;
       width: 86px;
+      z-index: 1000;
       background-color: #FFFFFF;
       border-radius: 3px;
       box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
@@ -810,7 +848,7 @@ At this point, the entirety of your code within your index.html file should mirr
       font-family: 'Montserrat', sans-serif;
       position: absolute;
       font-size: 13px;
-      bottom: 2px;
+      bottom: 4px;
       left: 10px;
     }
   </style>
@@ -820,13 +858,15 @@ At this point, the entirety of your code within your index.html file should mirr
   <!-- the map -->
   <div id="map"></div>
   <!-- ui slider -->
-  <div id="slider" class="leaflet-control">
-    <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
-    <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
-  </div>
-  <!-- temporal legend -->
-  <div id='temporal'>
-    <h5 class='txt-bold'><span></span></h5>
+  <div id="slider-control">
+    <div id="slider" class="leaflet-control">
+      <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+      <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+    </div>
+    <!-- temporal legend -->
+    <div id='temporal'>
+      <h5 class='txt-bold'><span></span></h5>
+    </div>
   </div>
   <!-- Add a link to the Leaflet JavaScript library so you can reference it for building your map -->
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
@@ -836,9 +876,7 @@ At this point, the entirety of your code within your index.html file should mirr
   <script>
     // define map options
     const mapOptions = {
-      zoomSnap: 0.5,  // this allows fractional zooming
       center: [37.5, -120], // center the map on the coordinates for California
-      zoom: 6.5, // set the initial zoom
     };
 
     // define the map with the options above
@@ -905,6 +943,9 @@ At this point, the entirety of your code within your index.html file should mirr
         }
       }).addTo(map);
 
+      // fit the map to the bounds of the wildfires layer
+      map.fitBounds(wildfires.getBounds());
+
       // define the value in the slider when the map loads
       let currentYear = $('.slider').val();
 
@@ -928,28 +969,7 @@ At this point, the entirety of your code within your index.html file should mirr
     // Add a temporal legend in sync with the UI slider
     function createTemporalLegend(currentYear) { // feed it the selected year
 
-      // define the temporal legend with a Leaflet control
-      const temporalLegend = L.control({
-        position: 'bottomleft' // place the temporal legend at bottom left corner
-      });
-
-      // when added to the map
-      temporalLegend.onAdd = function(map) {
-
-        const div = L.DomUtil.get("temporal"); // get the div
-
-        // disable the mouse events
-        L.DomEvent.addListener(div, 'mousedown', function(e) {
-          L.DomEvent.stopPropagation(e);
-        });
-
-        return div; // return the div from the function
-
-      }
-
       $('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
-
-      temporalLegend.addTo(map); // add the temporal legend to the map
 
     }; // End createTemporalLegend function
   </script>
@@ -1108,7 +1128,7 @@ else {
 
 ### Finalizing the City Layer
 
-The map is looking better, but it would be nice to have a way to make the city layer appear and disappear on demand. For this, we need to add a layer control. Within the initial function that processes our JSON files, add some code to define the layers for the layer control as well as the layer control just after the code that adds the urban areas to the map.
+The map is looking better, but it would be nice to have a way to make the city layer appear and disappear on demand. For this, we need to add a layer control. Within the initial function that processes our JSON files, add some code to define the layers for the layer control as well as the layer control just after the code that adds the urban areas to the map and the line that fits the map to the bounds of the wildfires layer.
 
 ```js
 // initiate a leaflet GeoJSON layer with L.geoJson, feed it the urban boundaries data, and add to the map
@@ -1134,6 +1154,9 @@ const urban = L.geoJson(caliCities, {
     });
   }
 }).addTo(map);
+
+// fit the map to the bounds of the wildfires layer
+map.fitBounds(wildfires.getBounds());
 
 // define layers for layer control
 const controlLayers = {
@@ -1503,6 +1526,9 @@ $.when(
 
   console.log(areasBurned);
 
+  // fit the map to the bounds of the wildfires layer
+  map.fitBounds(wildfires.getBounds());
+
   // define layers for layer control
   const controlLayers = {
     "Urban Areas": urban,
@@ -1609,13 +1635,15 @@ If you save your code and refresh your map, you will see an error message (`Unca
 <!-- the map -->
 <div id="map"></div>
 <!-- ui slider -->
-<div id="slider" class="leaflet-control">
-  <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
-  <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
-</div>
-<!-- temporal legend -->
-<div id='temporal'>
-  <h5 class='txt-bold'><span></span></h5>
+<div id="slider-control">
+  <div id="slider" class="leaflet-control">
+    <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+    <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+  </div>
+  <!-- temporal legend -->
+  <div id='temporal'>
+    <h5 class='txt-bold'><span></span></h5>
+  </div>
 </div>
 <!-- the area chart -->
 <div id="chart"></div>
@@ -1629,7 +1657,7 @@ Saving and refreshing your map will demonstrate some humorous results. The chart
   font-family: 'Montserrat', sans-serif;
   position: absolute;
   font-size: 13px;
-  bottom: 2px;
+  bottom: 4px;
   left: 10px;
 }
 
@@ -1727,11 +1755,21 @@ If anything went wrong, here is the final index.html code:
       bottom: 0;
     }
 
+    /* style the slider-control div */
+    #slider-control {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      width: 30%;
+      height: 25px;
+      z-index: 700;
+    }
+
     /* Set time slider styles */
     #slider {
       position: absolute;
-      height: 25px;
-      bottom: 10px;
+      height: 100%;
+      bottom: 0px;
       left: 125px;
       z-index: 1000;
       background-color: #FFFFFF;
@@ -1741,8 +1779,11 @@ If anything went wrong, here is the final index.html code:
 
     /* Set temporal legend styles */
     #temporal {
-      height: 25px;
+      position: absolute;
+      height: 100%;
+      bottom: 0px;
       width: 86px;
+      z-index: 1000;
       background-color: #FFFFFF;
       border-radius: 3px;
       box-shadow: 0px 0px 0px 2px rgba(0, 0, 0, 0.3);
@@ -1753,7 +1794,7 @@ If anything went wrong, here is the final index.html code:
       font-family: 'Montserrat', sans-serif;
       position: absolute;
       font-size: 13px;
-      bottom: 2px;
+      bottom: 4px;
       left: 10px;
     }
 
@@ -1798,13 +1839,15 @@ If anything went wrong, here is the final index.html code:
   <!-- the map -->
   <div id="map"></div>
   <!-- ui slider -->
-  <div id="slider" class="leaflet-control">
-    <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
-    <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
-  </div>
-  <!-- temporal legend -->
-  <div id='temporal'>
-    <h5 class='txt-bold'><span></span></h5>
+  <div id="slider-control">
+    <div id="slider" class="leaflet-control">
+      <!-- Use the first and last year of the time data as the min and max. Set the initial value as the first year. Set the steps at one year. -->
+      <input type="range" min="2010" max="2019" value="2010" step="1" class="slider" />
+    </div>
+    <!-- temporal legend -->
+    <div id='temporal'>
+      <h5 class='txt-bold'><span></span></h5>
+    </div>
   </div>
   <!-- the area chart -->
   <div id="chart"></div>
@@ -1820,9 +1863,7 @@ If anything went wrong, here is the final index.html code:
   <script>
     // define map options
     const mapOptions = {
-      zoomSnap: 0.5,  // this allows fractional zooming
       center: [37.5, -120], // center the map on the coordinates for California
-      zoom: 6.5, // set the initial zoom
     };
 
     // define the map with the options above
@@ -1938,6 +1979,9 @@ If anything went wrong, here is the final index.html code:
         }
       }).addTo(map);
 
+      // fit the map to the bounds of the wildfires layer
+      map.fitBounds(wildfires.getBounds());
+
       // define layers for layer control
       const controlLayers = {
         "Urban Areas": urban,
@@ -1975,28 +2019,7 @@ If anything went wrong, here is the final index.html code:
     // Add a temporal legend in sync with the UI slider
     function createTemporalLegend(currentYear) { // feed it the selected year
 
-      // define the temporal legend with a Leaflet control
-      const temporalLegend = L.control({
-        position: 'bottomleft' // place the temporal legend at bottom left corner
-      });
-
-      // when added to the map
-      temporalLegend.onAdd = function(map) {
-
-        const div = L.DomUtil.get("temporal"); // get the div
-
-        // disable the mouse events
-        L.DomEvent.addListener(div, 'mousedown', function(e) {
-          L.DomEvent.stopPropagation(e);
-        });
-
-        return div; // return the div from the function
-
-      }
-
       $('#temporal span').html("Year: " + currentYear); // change grade value to that currently selected by UI slider
-
-      temporalLegend.addTo(map); // add the temporal legend to the map
 
     }; // End createTemporalLegend function
 
